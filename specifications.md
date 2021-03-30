@@ -10,7 +10,7 @@ The following describes the main Mpesa class specification standards.
     - [src folder](#src-folder)
       - [Exceptions folder](#exceptions-folder)
       - [Extras folder](#extras-folder)
-      - [Tests folder](#tests-folder)
+    - [Tests folder](#tests-folder)
     - [Base directory](#base-directory)
   - [The mpesa constants class](#the-mpesa-constants-class)
   - [Main class](#main-class)
@@ -46,7 +46,7 @@ below.
 
 `src/Extras/MpesaConstants.ext` - This file will contain all constants related to our libabry
 
-#### Tests folder
+### Tests folder
 
 `tests/` - Where we will store our tests
 
@@ -133,13 +133,13 @@ The following are the specifications for the error codes
 
 ### Internal error
 
-```C#
+```java
 
     class MpesaInternalException extends Exception
     {
         // Initialize the error here with the details of the 
         // exception
-        constructor($message);
+        constructor(message: string);
     }
 
 ```
@@ -152,7 +152,7 @@ The following are the specifications for the error codes
     {
         // Initialize the error here with the details of the 
         // exception
-        constructor($message);
+        constructor(message: string);
 
         // Gets the https response status code
         public int getCode();
