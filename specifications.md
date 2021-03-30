@@ -2,6 +2,23 @@
 
 The following describes the main Mpesa class specification standards.
 
+## Table of contents
+
+- [Specifications](#specifications)
+  - [Table of contents](#table-of-contents)
+  - [The folder structure](#the-folder-structure)
+    - [src folder](#src-folder)
+      - [Exceptions folder](#exceptions-folder)
+      - [Extras folder](#extras-folder)
+      - [Tests folder](#tests-folder)
+    - [Base directory](#base-directory)
+  - [The mpesa constants class](#the-mpesa-constants-class)
+  - [Main class](#main-class)
+  - [Exceptions](#exceptions)
+    - [Internal error](#internal-error)
+    - [Client error](#client-error)
+    - [Server error](#server-error)
+
 ## The folder structure
 
 Here is the folder structure of the applications, for more details about what each file does scroll
@@ -33,7 +50,7 @@ below.
 
 `tests/` - Where we will store our tests
 
-#### Base directory
+### Base directory
 
 `LICENCE` - Copy of the licence, preferably MIT licence
 

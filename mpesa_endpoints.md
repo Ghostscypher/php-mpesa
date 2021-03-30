@@ -2,6 +2,35 @@
 
 The following specifies the mpesa endpoints, their data and their expected responses
 
+## Table of contents
+
+- [Mpesa endpoints](#mpesa-endpoints)
+  - [Table of contents](#table-of-contents)
+  - [The endpoints](#the-endpoints)
+  - [Get auth token](#get-auth-token)
+    - [_Request format_](#request-format)
+  - [Client to business register (C2B register)](#client-to-business-register-c2b-register)
+    - [_Request format_](#request-format-1)
+  - [Client to business simulate (C2B Simulate)](#client-to-business-simulate-c2b-simulate)
+    - [_Request format_](#request-format-2)
+  - [Business to client](#business-to-client)
+    - [_Request format_](#request-format-3)
+  - [Business to business](#business-to-business)
+    - [_Request format_](#request-format-4)
+  - [Account balance query](#account-balance-query)
+    - [_Request format_](#request-format-5)
+  - [Transaction status query](#transaction-status-query)
+    - [_Request format_](#request-format-6)
+  - [Reversal request](#reversal-request)
+    - [_Request format_](#request-format-7)
+  - [Initiate stk push query](#initiate-stk-push-query)
+    - [_Request format_](#request-format-8)
+  - [Initiate stk push query](#initiate-stk-push-query-1)
+    - [_Request format_](#request-format-9)
+  - [Errors, and error code](#errors-and-error-code)
+
+## The endpoints
+
 - `get auth token` - Endpoint to get the authentication token
 - `C2B Register` - Client to business register endpoint
 - `C2B Simulate` - Simulate transactions, only works during development
@@ -708,14 +737,14 @@ Response:
 
 ## Errors, and error code
 
-|Error Code |Meaning |
-| ------------- |:-------------|
-| 400 |Bad Request |
-| 401 |Unauthorized |
-| 403 |Forbidden |
-| 404 |Not Found |
-| 405 |Method Not Allowed |
-| 406 |Not Acceptable – You requested a format that isn’t json |
-| 429 |Too Many Requests |
-| 500 |Internal Server Error – We had a problem with our server. Try again later. |
-| 503 |Service Unavailable – We’re temporarily offline for maintenance. Please try again later. |
+| Error Code | Meaning                                                                                  |
+| ---------- | :--------------------------------------------------------------------------------------- |
+| 400        | Bad Request                                                                              |
+| 401        | Unauthorized                                                                             |
+| 403        | Forbidden                                                                                |
+| 404        | Not Found                                                                                |
+| 405        | Method Not Allowed                                                                       |
+| 406        | Not Acceptable – You requested a format that isn’t json                                  |
+| 429        | Too Many Requests                                                                        |
+| 500        | Internal Server Error – We had a problem with our server. Try again later.               |
+| 503        | Service Unavailable – We’re temporarily offline for maintenance. Please try again later. |
