@@ -3,8 +3,6 @@
 ## Introduction
 
 A PHP Library that wraps around the mpesa APIs
-<<<<<<< HEAD
-=======
 
 ## Getting Started
 
@@ -44,4 +42,3 @@ repository platform. Here is how we work with Git:
 
 In case of any assistance regarding the project, you can escalate the
 issue on the project's issue board.
->>>>>>> b43694d37cb28e49b2a454e250f1e3ea071085d3

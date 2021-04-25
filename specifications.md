@@ -117,9 +117,10 @@ The code below shows what is expected to be in the mpesa classes
 class Mpesa {
 
     // Singleton instance of the MpesaConfig class
-    private MpesaConfig config;
+    private static MpesaConfig config;
 
-    // Initialize the class here including the base uri endpoints
+    // Initialize the class here, also initialize the sibgleton instance
+    // only once
     constructor(config: MpesaConfig); 
 
     // Gets the Mpesa config singleton instance and allows a user to change the configurations before next
@@ -221,7 +222,10 @@ This is a small helper class whose sole purpose is to store the mpesa autheticat
 class MpesaAuth {
 
     // Singleton class
-    private MpesaAuth mpesaAuth;
+    private static MpesaAuth mpesaAuth;
+
+    // Contructor, initialize the singleton class
+    MpesaAuth();
 
     // Used to generate the consumer keys and secret
     public static MpesaAuth getAuthToken(consumer_key: string, consumer_secret: string);
