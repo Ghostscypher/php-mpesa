@@ -13,9 +13,9 @@ The following specifies the mpesa endpoints, their data and their expected respo
     - [_Request format_](#request-format-1)
   - [Client to business simulate (C2B Simulate)](#client-to-business-simulate-c2b-simulate)
     - [_Request format_](#request-format-2)
-  - [Business to client](#business-to-client)
+  - [Business to client (B2C)](#business-to-client-b2c)
     - [_Request format_](#request-format-3)
-  - [Business to business](#business-to-business)
+  - [Business to business (B2B)](#business-to-business-b2b)
     - [_Request format_](#request-format-4)
   - [Account balance query](#account-balance-query)
     - [_Request format_](#request-format-5)
@@ -23,9 +23,9 @@ The following specifies the mpesa endpoints, their data and their expected respo
     - [_Request format_](#request-format-6)
   - [Reversal request](#reversal-request)
     - [_Request format_](#request-format-7)
-  - [Initiate stk push query](#initiate-stk-push-query)
+  - [Initiate stk push](#initiate-stk-push)
     - [_Request format_](#request-format-8)
-  - [Initiate stk push query](#initiate-stk-push-query-1)
+  - [Initiate stk push query](#initiate-stk-push-query)
     - [_Request format_](#request-format-9)
   - [Errors, and error code](#errors-and-error-code)
 
@@ -183,7 +183,7 @@ Response:
 }
 ```
 
-## Business to client
+## Business to client (B2C)
 
 Method: `POST`
 
@@ -212,7 +212,7 @@ Body:
         "Remarks": " ", // Comments that are sent along with the transaction.
         "QueueTimeOutURL": "http://your_timeout_url", // The timeout end-point that receives a timeout response.
         "ResultURL": "http://your_result_url", // The end-point that receives the response of the transaction
-        "Occasion": " " // Optional description to be sebt along with the transaction
+        "Occasion": " " // Optional description to be sent along with the transaction
     }
 ```
 
@@ -274,7 +274,7 @@ Response:
   
 ```
 
-## Business to business
+## Business to business (B2B)
 
 Method: `POST`
 
@@ -606,9 +606,7 @@ Response:
 }
 ```
 
-
-
-## Initiate stk push query
+## Initiate stk push
 
 Method: `POST`
 

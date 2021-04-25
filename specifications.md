@@ -18,6 +18,14 @@ The following describes the main Mpesa class specification standards.
     - [Internal error](#internal-error)
     - [Client error](#client-error)
     - [Server error](#server-error)
+  - [Mpesa auth class](#mpesa-auth-class)
+  - [MPesa configuration class](#mpesa-configuration-class)
+  - [Mpesa HTTP client class](#mpesa-http-client-class)
+  - [Mpesa response class](#mpesa-response-class)
+  - [Mpesa client to business (C2B) class](#mpesa-client-to-business-c2b-class)
+  - [Mpesa business to business (B2B) client class](#mpesa-business-to-business-b2b-client-class)
+  - [Mpesa bisiness to client (B2C) class](#mpesa-bisiness-to-client-b2c-class)
+  - [To bring it all together](#to-bring-it-all-together)
 
 ## The folder structure
 
@@ -96,21 +104,27 @@ This class is used to store our constants, it will make it easier for us to grou
 
 ## Main class
 
-This class is the main entry point into our library, below is a basic outline of how the mpesa
-class might look like
+This class is the main entry point into our library. Moreover this class will contain functions to perform general
+requests such as
+
+1. Account balance query
+2. Tranasction status query
+3. Reversal request
+
+The code below shows what is expected to be in the mpesa classes
 
 ```c#
 class Mpesa {
+
+    // Singleton instance of the MpesaConfig class
+    private MpesaConfig config;
+
     // Initialize the class here including the base uri endpoints
-    constructor(consumer_key: string, consumer_secret: string, is_development = true: boolean, optional); 
+    constructor(config: MpesaConfig); 
 
-    // Used to set the consumer key, remember to regenerate the credentials
-    // Allow chaining, see example below
-    public Mpesa setConsumerKey(value: string);
-
-    // Used to set the consumer secret, remember to regenerate the credentials
-    // Allow chaining, see example below
-    public Mpesa setConsumerSecret(value: string);
+    // Gets the Mpesa config singleton instance and allows a user to change the configurations before next
+    // request
+    public MpesaConfig config();
 
 }
 ```
@@ -198,7 +212,259 @@ The following are the specifications for the error codes
 
 The following highlights the requests we are going to make to the mpesa endpoints. To see the endpoints check here [Mpesa endpoints](./mpesa_endpoints.md)
 
-We now need to decide how we will group the related endpoints, which data they have in common, and how we can abstract things
+## Mpesa auth class
 
-1. Separate the requests if it is a till, or paybill
-2. Create abstractions around each and every action
+This is a small helper class whose sole purpose is to store the mpesa authetication credentials, to avoid recreating, the crentials over and over again
+
+```java
+
+class MpesaAuth {
+
+    // Singleton class
+    private MpesaAuth mpesaAuth;
+
+    // Used to generate the consumer keys and secret
+    public static MpesaAuth getAuthToken(consumer_key: string, consumer_secret: string);
+
+    // Check whether the credentials has expired
+    public boolean hasExpired();
+
+    // Return UNIX timestamp of when the token will expire
+    public long getExpiresAtTime();
+
+    // Return the authentication token
+    public String getToken();
+
+}
+
+```
+
+## MPesa configuration class
+
+This class will hold a list of cinfigurations that will need to be passed between different classes
+Please note that this class should allowchaining, will also add helper methods for ease of changing
+configs
+
+```java
+
+class MpesaConfig {
+
+    // Default constructor
+    MpesaConfig(); // --> Must be public for java guys
+
+    // This constructor recieves the configuration as an array
+    // and parses it, dictionary format will be shown below
+    MpesaConfig(config: dictionary: key: string, value: any);
+
+    // This constructor recieves the configuration as a string
+    // and parses it, string format will be shown below
+    MpesaConfig(config: string);
+
+    // Set development environment
+    // Only accepts sandbox, production
+    public MpesaConfig setEnvironment(is_sandbox: boolean);
+
+    // Return the development environment as string
+    public String getEnvironment();
+
+    // Provides redundancy for the development environment
+    public boolean isSandboxEnvironment();
+    public boolean isProductionEnvironment();
+
+    // Used to set the consumer key, remember to regenerate the credentials
+    // Allow chaining, see example below
+    public MpesaConfig setConsumerKey(value: string);
+
+    // Return the consumer key
+    public String getConsumerKey();
+
+    // Used to set the consumer secret, remember to regenerate the credentials
+    // Allow chaining, see example below
+    public MpesaConfig setConsumerSecret(value: string);
+
+    // Return the consumer secret
+    public String getConsumerSecret();
+
+    // Generates the credentials and returns it
+    public String getCredential();
+
+    // Gets the authentication token as a key value pair
+    // token: auth token
+    // expires: unsigned integer
+    public MpesaAuth getAuth();
+
+    // Used to set the shortcode
+    // Allow chaining, see example below
+    public MpesaConfig setShortCode(value: int);
+
+    // Return the shortcode
+    public int getShortCode();
+
+    // Used to set the confirmationURL
+    // Allow chaining, see example below
+    public MpesaConfig setConfirmationURL(value: string);
+
+    // Return the confirmationURL
+    public String getConfirmationURL();
+
+    // Used to set the validationURL
+    // Allow chaining, see example below
+    public MpesaConfig setValidationURL(value: string);
+
+    // Return the validationURL
+    public String getValidationURL();
+
+    // Used to set the queueTimeoutURL
+    // Allow chaining, see example below
+    public MpesaConfig setQueueTimeoutURL(value: string);
+
+    // Return the queueTimeoutURL
+    public String getQueueTimeoutURL();
+
+    // Used to set the resultURL
+    // Allow chaining, see example below
+    public MpesaConfig setValidationURL(value: string);
+
+    // Return the resultURL
+    public String getResultURL();
+
+    // Used to set the STK callback URL
+    // Allow chaining, see example below
+    public MpesaConfig setSTKCallbackURL(value: string);
+
+    // Return the STK callback
+    public String getSTKCallbackURL();   
+
+    // Helper method to get the UTL via url name
+    // see example usage below
+    public String url(name: string); 
+
+    // Used to set the initiator name/same to initiator
+    // Allow chaining, see example below
+    public MpesaConfig setInitiatorName(value: string);
+
+    // Return the initiator name
+    public String getInitiatorName();
+
+    // Return the initiator name
+    // simply call getInitiatorName() in this method
+    // provided as a redundancy please note that initiatorName and initiator mean the same thing
+    public String getInitiator();
+
+    // Provides a way of checking if a configuration is set
+    public boolean isConfigSet(key: string);
+
+    // Provides redundant way of getting a specific configuration easily
+    public Any getConfig(key: string);
+
+}
+
+```
+
+## Mpesa HTTP client class
+
+This is the class that will contain the logic for sending and recieveing http requests, it is a simple class
+with only one purpose i.e. handle the sending and recieving of http requests, mist classes will inherit from this
+
+```java
+
+/**
+* This class shouldn't be called directly and is for internal use only
+*/
+class MpesaHttp {
+
+    // TODO: add interfaces later
+
+}
+
+```
+
+## Mpesa response class
+
+This class unifies the JSON results gotten from a request, this allows all libraries to have a common
+way of returning the results of a given request, implementation details will be given later on
+
+```java
+
+class MpesaResponse {
+
+}
+
+```
+
+## Mpesa client to business (C2B) class
+
+This class will contain logic for handling all the client to business requests/logic this includes
+
+1. Register and confirmationURL/ValidationURL endpoints
+2. Simulate transaction - Only available in sandbox environment
+3. Initiate an STK push request
+4. Check the status of the STK push i.e. STK push query
+
+``` java
+class MpesaC2B {
+    // Constructor
+    // We need to pass in the config by ref
+    // the mode determines which transactions we will be performing
+    // mode allows only paybill_mode, till_mode
+    MpesaC2B(config: MpesaConfig, mode: CONSTANT);
+
+    // Set a given mode
+    // allows only paybill_mode, till_mode
+    // See example implementation
+    public MpesaC2B setMode(mode: CONSTANT);
+
+    // Returns the mode, since it's a constant it will point to a given mode 
+    public String getMode();
+
+    // Performs the register
+    // All data is in config
+    public MpesaResponse register();
+
+    // Simulate a transaction, this is only available in sandbox 
+    // amount is an unsigned int always check for negative or 0
+    public MpesaResponse simulate(MSISDN: string, amount :int);
+
+    // Initiate STK push query
+    // amount is an unsigned int always check for negative or 0
+    // partyB is optional can be the same as business shortcode if left empty
+    // timestamp must be in the format 'yyyymmddhhiiss'
+    // account reference will be needed in paybill_mode, will be ignored in till_mode
+    public MpesaReposnse initiateSTKPush(amount: int, optional partyB = 0: int, 
+        optinal timestamp = '': timestamp, optional account_reference = '': string, optional description = '': string);
+
+    // Query the mpesa client gateway to check for the status of an STK push
+    // We generate our timestamp if it is not filled, timestamp must be in the format 'yyyymmddhhiiss'
+    public MpesaResponse STKPushQuery(checkout_rquest_id: string, optional timestamp = '': string);
+
+}
+
+```
+
+## Mpesa business to business (B2B) client class
+
+This class will handle the logic of performing a B2B related request, it has one method only
+
+1. B2Bpayment
+
+``` java
+class MpesaB2B {
+    
+}
+
+```
+
+## Mpesa bisiness to client (B2C) class
+
+This class will handle logic of performing B2C related request, it has one method only
+
+1. B2Cpayment
+
+## To bring it all together
+
+``` java
+class MpesaB2C {
+    
+}
+
+```
