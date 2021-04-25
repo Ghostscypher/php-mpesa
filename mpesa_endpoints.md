@@ -39,7 +39,7 @@ The following specifies the mpesa endpoints, their data and their expected respo
 - `Account balance query` - Used to check the account balance
 - `Transaction status query` - Used to query the transaction status
 - `Initialize stk push` - Used to initilize an stk push
-- `Stk push query` - Used to cehck the status of an stk push
+- `Stk push query` - Used to check the status of an stk push
 - `Reversal` - Used to initiate a reversal request
 
 Let's have a look at each of the endpoints and their expected results

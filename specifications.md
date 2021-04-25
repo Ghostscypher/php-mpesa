@@ -162,7 +162,7 @@ The following are the specifications for the error codes
         public String getErrorBody();
 
         // Get's the error response status message as string
-        // you may ovveride the default `getMessage()` if you wish
+        // you may override the default `getMessage()` if you wish
         // examples include, `invalid authentication credentials`
         public String getMessage();
 
@@ -178,7 +178,7 @@ The following are the specifications for the error codes
     {
         // Initialize the error here with the details of the 
         // exception
-        constructor($message);
+        constructor(message: string);
 
         // Gets the https response status code
         public int getCode();
@@ -188,7 +188,7 @@ The following are the specifications for the error codes
         public String getErrorBody();
 
         // Get's the error response status message as string
-        // you may ovveride the default `getMessage` if you wish
+        // you may override the default `getMessage` if you wish
         // examples include, `service temporarily unavailable`
         public String getMessage();
 
@@ -196,7 +196,7 @@ The following are the specifications for the error codes
 
 ```
 
-So far this is the basic outline i've managed to come up with. The following highlights the requests we are going to make to the mpesa endpoints. To see the endpoints check here [Mpesa endpoints](./mpesa_endpoints.md)
+The following highlights the requests we are going to make to the mpesa endpoints. To see the endpoints check here [Mpesa endpoints](./mpesa_endpoints.md)
 
 We now need to decide how we will group the related endpoints, which data they have in common, and how we can abstract things
 
