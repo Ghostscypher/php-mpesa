@@ -31,6 +31,7 @@ The following specifies the mpesa endpoints, their data and their expected respo
   - [Identifier Types](#identifier-types)
   - [M-Pesa Result and Response Codes (From gateway to client)](#m-pesa-result-and-response-codes-from-gateway-to-client)
   - [M-Pesa Response Codes (from client back to gateway)](#m-pesa-response-codes-from-client-back-to-gateway)
+  - [Mpesa command ids](#mpesa-command-ids)
 
 ## The endpoints
 
@@ -796,3 +797,23 @@ Response codes are sent from the clients endpoints back to the gateway. This is 
 | 0                     | Success (for C2B)
 | 00000000              | Success (For APIs that are not C2B)
 | 1 or any other number | Rejecting the transaction
+
+## Mpesa command ids
+
+This are the command ids supported by mpesa, they tell the mpesa gateway which commands to perform
+
+| Command ID | Description  |
+| ---------- | :-------------------------------------------------- |
+| TransactionReversal | Reversal for an erroneous C2B transaction. |
+| SalaryPayment | Used to send money from an employer to employees e.g. salaries |
+| BusinessPayment | Used to send money from business to customer e.g. refunds |
+| PromotionPayment | Used to send money when promotions take place e.g. raffle winners. |
+| AccountBalance | Used to check the balance in a paybill/buy goods account (includes utility, MMF, Merchant, Charges paid account). |
+| CustomerPayBillOnline | Used to simulate a transaction taking place in the case of C2B Simulate Transaction or to initiate a transaction on behalf of the customer (STK Push). |
+| TransactionStatusQuery | Used to query the details of a transaction. |
+| CheckIdentity | Similar to STK push, uses M-Pesa PIN as a service. |
+| BusinessPayBill | Sending funds from one paybill to another paybill |
+| BusinessBuyGoods | sending funds from buy goods to another buy goods. |
+| DisburseFundsToBusiness | Transfer of funds from utility to MMF account. |
+| BusinessToBusinessTransfer | Transferring funds from one paybills MMF to another paybills MMF account. |
+| BusinessTransferFromMMFToUtility | Transferring funds from paybills MMF to another paybills utility account. |

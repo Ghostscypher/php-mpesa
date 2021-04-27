@@ -130,6 +130,8 @@ You can copy the configs below and make them language specific.
         const MPESA_IDNTIFIER_TYPE_PAYBILL = '4';
         const MPESA_IDNTIFIER_TYPE_SHORTCODE = '4';
 
+        // Command ids
+
         // Http codes
         // 2xx series
         const MPESA_HTTP_OK = 200;
@@ -249,7 +251,8 @@ class Mpesa {
     // amount: The amount that is being reversed
     // receiver_party: the shortcode, or MSISDN that recieved the payment
     // receiver_identifier_type: constant that shows the reciever identifier type
-    //         possible values are; TODO: write possible values
+    //         possible values are; MPESA_IDNTIFIER_TYPE_MSISDN, MPESA_IDNTIFIER_TYPE_TILL,
+    //                MPESA_IDNTIFIER_TYPE_PAYBILL , MPESA_IDNTIFIER_TYPE_SHORTCODE 
     public MpesaReponse reverseTransaction(
         transaction_id: string,
         amount: int,
