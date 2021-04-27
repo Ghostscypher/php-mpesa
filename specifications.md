@@ -2,12 +2,16 @@
 
 The following describes the main Mpesa class specification standards.
 
+Please check the [example implementation](./example_implementations.md) for a generic pseudocode of the
+implementation of  the sepecifiations below.
+
 ## Table of contents
 
 - [Specifications](#specifications)
   - [Table of contents](#table-of-contents)
   - [The folder structure](#the-folder-structure)
     - [src folder](#src-folder)
+      - [Main folder](#main-folder)
       - [Exceptions folder](#exceptions-folder)
       - [Extras folder](#extras-folder)
     - [Tests folder](#tests-folder)
@@ -25,18 +29,37 @@ The following describes the main Mpesa class specification standards.
   - [Mpesa client to business (C2B) class](#mpesa-client-to-business-c2b-class)
   - [Mpesa business to business (B2B) client class](#mpesa-business-to-business-b2b-client-class)
   - [Mpesa bisiness to client (B2C) class](#mpesa-bisiness-to-client-b2c-class)
-  - [To bring it all together](#to-bring-it-all-together)
 
 ## The folder structure
 
 Here is the folder structure of the applications, for more details about what each file does scroll
 below.
+Please note that the .ext is a generic extension which stands for the file extension of the library you are
+creating for example we can have `Mpesa.php`, `Mpesa.cpp`, `Mpesa.py`, etc.
 
 ### src folder
 
 `src/` - Where our source files will be stored
 
 `src/Mpesa.ext` - The main class
+
+#### Main folder
+
+`Main/` - Where we will store all the classes that will be used by the library, excluding main.ext
+
+`Main/MpesaConfig.ext` - The MpesaConfig class
+
+`Main/MpesaAuth.ext` - The MpesaAuth class
+
+`Main/MpesaHttp.ext` - The MpesaHttp class
+
+`Main/MpesaReponse.ext` - The MpesaResponse class
+
+`Main/MpesaC2B.ext` - The MpesaC2B class
+
+`Main/MpesaB2B.ext` - The MpesaB2B class
+
+`Main/MpesaB2C.ext` - The MpesaB2C class
 
 #### Exceptions folder
 
@@ -66,7 +89,8 @@ below.
 
 ## The mpesa constants class
 
-This class is used to store our constants, it will make it easier for us to group our constants
+This class is used to store our constants, it will make it easier for us to group our constants.
+You can copy the configs below and make them language specific.
 
 ```Java
     class MpesaConstants
@@ -116,8 +140,11 @@ The code below shows what is expected to be in the mpesa classes
 ```c#
 class Mpesa {
 
-    // Singleton instance of the MpesaConfig class
+    // Create singleton instance of the following classes
     private static MpesaConfig config;
+    private static MpesaB2C B2C;
+    private static MpesaC2B C2B;
+    private static MpesaB2B B2B;
 
     // Initialize the class here, also initialize the sibgleton instance
     // only once
@@ -126,6 +153,50 @@ class Mpesa {
     // Gets the Mpesa config singleton instance and allows a user to change the configurations before next
     // request
     public MpesaConfig config();
+
+    // Returns an instance of the MpesaC2B class
+    public MpesaC2B C2B();
+
+    // Returns an instance of the MpesaB2B class
+    public MpesaB2B B2B();
+
+    // Returns an instance of the MpesaB2C class
+    public MpesaB2C B2C();
+
+    // The following specifies the general requests found in this class
+    // these are:
+    //      1. Account balance query
+    //      2. Transaction status query
+    //      3. Reversal
+
+    // Account balance query
+    // Optional remarks sent with the request
+    public MpesaReponse checkBalance(optional remarks='remarks': string);
+
+    // Transaction status, check the transaction status of an mpesa code
+    // transaction_id: This is the mpesa code
+    // Remarks: comments sent along with the tranasction
+    // Occasion: additional data sent with the tranasaction
+    public MpesaReponse checkTransactionStatus(
+        transaction_id: string,
+        optional remarks='remarks': string,
+        optional occasion='': string
+    );
+
+    // Initiate reversal request
+    // transaction_id: The npesa code.
+    // amount: The amount that is being reversed
+    // receiver_party: the shortcode, or MSISDN that recieved the payment
+    // receiver_identifier_type: constant that shows the reciever identifier type
+    //         possible values are; TODO: write possible values
+    public MpesaReponse reverseTransaction(
+        transaction_id: string,
+        amount: int,
+        receiver_party: string,
+        receiver_identifier_type: CONSTANT,
+        optional remarks='remarks': string,
+        optional occasion='': string
+    );
 
 }
 ```
@@ -254,6 +325,7 @@ configs
 class MpesaConfig {
 
     // Default constructor
+    // Set defaukt environment as sandbox
     MpesaConfig(); // --> Must be public for java guys
 
     // This constructor recieves the configuration as an array
@@ -297,12 +369,27 @@ class MpesaConfig {
     // expires: unsigned integer
     public MpesaAuth getAuth();
 
-    // Used to set the shortcode
+    // Used to set the shortcode, this is usually the
+    // partyA or partyB depending on the transaction
+    // identidier_type, indicates the kind of shortcode this is
+    // allowed are IDENTIFIER_TYPE_TILL, IDENTIFIER_TYPE_PAYBILL
     // Allow chaining, see example below
-    public MpesaConfig setShortCode(value: int);
+    public MpesaConfig setShortCode(value: string, identifier_type: CONSTANT);
 
     // Return the shortcode
-    public int getShortCode();
+    public String getShortCode();
+
+    // The business short code is often the head office number
+    // this is usually used to initiate an stk tranasction
+    // if left blank we assume the business short code is the same as
+    // short code
+    public MpesaConfig setBusinessShortCode(value: string);
+
+    // Return the business short code
+    public string getBusinessShortCode();
+
+    // Return the identifier type
+    public String getIdentifierType();
 
     // Used to set the confirmationURL
     // Allow chaining, see example below
@@ -355,11 +442,21 @@ class MpesaConfig {
     // provided as a redundancy please note that initiatorName and initiator mean the same thing
     public String getInitiator();
 
+    // Set the password
+    // This password will be used in the generation of the security credential
+    // itis also used in initializing stk push requests
+    public MpesaConfig setPassword(value: string);
+
+    // Returns the mpesa pasword
+    public string getPassword();
+
     // Provides a way of checking if a configuration is set
+    // exists is an alias for isConfigSet
     public boolean isConfigSet(key: string);
+    public boolean exists(key: string);
 
     // Provides redundant way of getting a specific configuration easily
-    public Any getConfig(key: string);
+    public String getConfig(key: string);
 
 }
 
@@ -377,7 +474,23 @@ with only one purpose i.e. handle the sending and recieving of http requests, mi
 */
 class MpesaHttp {
 
-    // TODO: add interfaces later
+    // Cobsrructor pass in the authentication data to be used for each request
+    MpesaHttp(auth: MpesaAuth);
+
+    // This will be used to send Http requests
+    // The method refers to HTTP method to send this can be GET, POST, PUT, PATCH, DELETE
+    // body: The body of the request, this is the data that will be sent with the request
+    // headers: this refers to extra headests that will be sent with the current request
+    //         'accept: application/json' and 'cache-control: no-cache' is included by default
+    // options: this is any other configurations not included but need to be added for the request
+    public MpesaResponse request(
+        method: string, 
+        optional body: dictionary(key: string, value: string) = null,
+        optional dictionary(key: string, value: string) = null, 
+        optional dictionary(key: string, value: string) = null
+    );
+
+    // Include any number of helper methods you might find necessary
 
 }
 
@@ -391,6 +504,21 @@ way of returning the results of a given request, implementation details will be 
 ```java
 
 class MpesaResponse {
+
+    // Constructor, initialize this with json reponse string,
+    // You can parse this to produce key value pairs
+    MpesaReponse(response: string);
+
+    // Returns the original json response as string
+    // the user can parse this if necessary
+    public string getJSONString();
+
+    // Returns a specific key in the json reponse
+    // You can use recursive walk to find the key
+    // even more efficiently, cache the results of the walk
+    // for direct access, the data returned might be of any type including
+    // another response
+    public any get(key: string);
 
 }
 
@@ -409,17 +537,14 @@ This class will contain logic for handling all the client to business requests/l
 class MpesaC2B {
     // Constructor
     // We need to pass in the config by ref
-    // the mode determines which transactions we will be performing
-    // mode allows only paybill_mode, till_mode
-    MpesaC2B(config: MpesaConfig, mode: CONSTANT);
+    // The command id, of the shortcode this is will be determined by the shortcode identifier type
+    MpesaC2B(config: MpesaConfig);
 
-    // Set a given mode
-    // allows only paybill_mode, till_mode
-    // See example implementation
-    public MpesaC2B setMode(mode: CONSTANT);
+    // Used to overwrite the default config set 
+    public MpesaC2B setConfig(config: MpesaConfig);
 
-    // Returns the mode, since it's a constant it will point to a given mode 
-    public String getMode();
+    // Return the current config
+    public MpesaConfig getConfig();
 
     // Performs the register
     // All data is in config
@@ -430,12 +555,16 @@ class MpesaC2B {
     public MpesaResponse simulate(MSISDN: string, amount :int);
 
     // Initiate STK push query
-    // amount is an unsigned int always check for negative or 0
-    // partyB is optional can be the same as business shortcode if left empty
-    // timestamp must be in the format 'yyyymmddhhiiss'
-    // account reference will be needed in paybill_mode, will be ignored in till_mode
-    public MpesaReposnse initiateSTKPush(amount: int, optional partyB = 0: int, 
-        optinal timestamp = '': timestamp, optional account_reference = '': string, optional description = '': string);
+    // amount: is an unsigned int always check for negative or 0
+    // to: the MSISDN sending the funds
+    // account_reference: 
+    // timestamp: must be in the format 'yyyymmddhhiiss'
+    public MpesaResponse initiateSTKPush(
+        amount: int, 
+        to: string, 
+        optional account_reference = '': string, 
+        optinal timestamp = '': string, 
+        optional description = '': string);
 
     // Query the mpesa client gateway to check for the status of an STK push
     // We generate our timestamp if it is not filled, timestamp must be in the format 'yyyymmddhhiiss'
@@ -454,6 +583,39 @@ This class will handle the logic of performing a B2B related request, it has one
 ``` java
 class MpesaB2B {
     
+    // Constructor
+    // Pass in the mpesa config by ref, this configuration will be immutable
+    // command_id will be a constant specifiying the commandID
+    // TODO: Add the supported command ids here
+    MpesaB2B(config: MpesaConfig, command_id: CONSTANT);
+
+    // Used to overwrite the default config set 
+    public MpesaB2B setConfig(config: MpesaConfig);
+
+    // Return the current config
+    public MpesaConfig getConfig();
+
+    // Perform a B2B transaction
+    // amount: amount to transact
+    // to: Organization’s short code recieving funds being transacted.
+    // receiver_identifier_type: specifies the indetifier type of the receiver
+    //       supported types incluce: TODO: add supported constants here
+    // account_reference: optional account sent if we are using paybill
+    // remarks: comments sent along with the transaction
+    public MpesaRepsonse send(
+        amount: int, 
+        to: string,
+        receiver_identifier_type: CONSTANT,
+        optional account_reference = '': string,
+        optional remarks = 'remarks': string
+    );
+
+    // Replace the current command id
+    public MpesaB2B setCommandID(command_id: CONSTANT);
+
+    // Returns the current command ID
+    public string getCommandID();
+
 }
 
 ```
@@ -464,11 +626,40 @@ This class will handle logic of performing B2C related request, it has one metho
 
 1. B2Cpayment
 
-## To bring it all together
-
 ``` java
 class MpesaB2C {
-    
+    // Constructor
+    // Pass in the mpesa config by ref, this configuration will be immutable
+    // command_id will be a constant specifiying the commandID
+    // TODO: Add the supported command ids here
+    MpesaB2C(config: MpesaConfig, command_id: CONSTANT);
+
+    // Used to overwrite the default config set 
+    public MpesaB2C setConfig(config: MpesaConfig);
+
+    // Return the current config
+    public MpesaConfig getConfig();
+
+    // Replace the current command id
+    public MpesaB2C setCommandID(command_id: CONSTANT);
+
+    // Returns the current command ID
+    public string getCommandID();
+
+    // Perform a B2C transaction
+    // amount: amount to transact
+    // to: MSISDN recieving funds being transacted.
+    // account_reference: optional account sent if we are using paybill
+    // remarks: comments sent along with the transaction
+    // occasion: optional description sent along with the tranasction
+    public MpesaRepsonse send(
+        amount: int, 
+        to: string,
+        optional account_reference = '': string,
+        optional remarks = 'remarks': string,
+        optinal occasion = '': string
+    );
+
 }
 
 ```

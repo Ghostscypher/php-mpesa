@@ -28,6 +28,9 @@ The following specifies the mpesa endpoints, their data and their expected respo
   - [Initiate stk push query](#initiate-stk-push-query)
     - [_Request format_](#request-format-9)
   - [Errors, and error code](#errors-and-error-code)
+  - [Identifier Types](#identifier-types)
+  - [M-Pesa Result and Response Codes (From gateway to client)](#m-pesa-result-and-response-codes-from-gateway-to-client)
+  - [M-Pesa Response Codes (from client back to gateway)](#m-pesa-response-codes-from-client-back-to-gateway)
 
 ## The endpoints
 
@@ -375,7 +378,6 @@ Response:
 }
 ```
 
-
 ## Account balance query
 
 Method: `POST`
@@ -440,7 +442,6 @@ Response:
 }
   
 ```
-
 
 ## Transaction status query
 
@@ -746,3 +747,50 @@ Response:
 | 429        | Too Many Requests                                                                        |
 | 500        | Internal Server Error – We had a problem with our server. Try again later.               |
 | 503        | Service Unavailable – We’re temporarily offline for maintenance. Please try again later. |
+
+## Identifier Types
+
+Identifier Types
+
+Identifier types - both sender and receiver - identify an M-Pesa transaction’s sending and receiving party as either a shortcode, a till number or a MSISDN (phone number). There are three identifier types that can be used with M-Pesa APIs.
+
+| Identifier | Identity    |
+| ---------- | :---------- |
+| 1          | MSISDN      |
+| 2          | Till Number |
+| 4          | Shortcode   |
+
+## M-Pesa Result and Response Codes (From gateway to client)
+
+This describes the reponse codes gotten from the gateway
+M-Pesa Result Codes
+
+| Result Code | Description
+| ------------ | :------------------------------------ |
+| 0            | Success                               |
+| 1            | Insufficient Funds                    |
+| 2            | Less Than Minimum Transaction Value   |
+| 3            | More Than Maximum Transaction Value   |
+| 4            |Would Exceed Daily Transfer Limit      |
+| 5            | Would Exceed Minimum Balance          |
+| 6            | Unresolved Primary Party              |
+| 7            | Unresolved Receiver Party             |
+| 8            | Would Exceed Maxiumum Balance         |
+| 11           | Debit Account Invalid                 |
+| 12           | Credit Account Invalid                |
+| 13           | Unresolved Debit Account              |
+| 14           | Unresolved Credit Account             |
+| 15           | Duplicate Detected                    |
+| 17           | Internal Failure                      |
+| 20           | Unresolved Initiator                  |
+| 26           | Traffic blocking condition in place   |
+
+## M-Pesa Response Codes (from client back to gateway)
+
+Response codes are sent from the clients endpoints back to the gateway. This is done to acknowledge that the client has received the results.
+
+| Result Code           | Description |
+| --------------------- | :---------- |
+| 0                     | Success (for C2B)
+| 00000000              | Success (For APIs that are not C2B)
+| 1 or any other number | Rejecting the transaction
