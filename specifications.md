@@ -131,6 +131,19 @@ You can copy the configs below and make them language specific.
         const MPESA_IDNTIFIER_TYPE_SHORTCODE = '4';
 
         // Command ids
+        const MPESA_COMMAND_ID_TRANSACTION_REVERSAL = 'TransactionReversal';
+        const MPESA_COMMAND_ID_SALARY_PAYMENT = 'SalaryPayment';
+        const MPESA_COMMAND_ID_BUSINESS_PAYMENT = 'BusinessPayment';
+        const MPESA_COMMAND_ID_PROMOTION_PAYMENT = 'PromotionPayment';
+        const MPESA_COMMAND_ID_ACCOUNT_BALANCE = 'AccountBalance';
+        const MPESA_COMMAND_ID_CUSTOMER_PAYBILL_ONLINE = 'CustomerPayBillOnline';
+        const MPESA_COMMAND_ID_TRANSACTION_STATUS_QUERY = 'TransactionStatusQuery';
+        const MPESA_COMMAND_ID_CHECK_IDENTITY = 'CheckIdentity';
+        const MPESA_COMMAND_ID_BUSINESS_PAY_BILL = 'BusinessPayBill';
+        const MPESA_COMMAND_ID_BUSINESS_PAY_BUY_GOODS = 'BusinessBuyGoods';
+        const MPESA_COMMAND_ID_DISBURSE_FUNDS_TO_BUSINESS = 'DisburseFundsToBusiness';
+        const MPESA_COMMAND_ID_BUSINESS_TO_BUSINESS_TRANSFER = 'BusinessToBusinessTransfer';
+        const MPESA_COMMAND_ID_TRANSFER_FROM_MMF_TO_UTILITY = 'BusinessTransferFromMMFToUtility';
 
         // Http codes
         // 2xx series
