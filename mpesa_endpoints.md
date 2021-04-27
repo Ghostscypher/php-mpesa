@@ -736,6 +736,8 @@ Response:
 
 ## Errors, and error code
 
+This is the error codes returned from http requests and their meaning
+
 | Error Code | Meaning                                                                                  |
 | ---------- | :--------------------------------------------------------------------------------------- |
 | 400        | Bad Request                                                                              |

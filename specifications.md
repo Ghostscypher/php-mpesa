@@ -34,7 +34,7 @@ implementation of  the sepecifiations below.
 
 Here is the folder structure of the applications, for more details about what each file does scroll
 below.
-Please note that the .ext is a generic extension which stands for the file extension of the library you are
+Please note that the `.ext` is a generic extension which stands for the file extension of the library you are
 creating for example we can have `Mpesa.php`, `Mpesa.cpp`, `Mpesa.py`, etc.
 
 ### src folder
@@ -95,6 +95,7 @@ You can copy the configs below and make them language specific.
 ```Java
     class MpesaConstants
     {
+        // The Mpesa endpoints
         const MPESA_ENDPOINTS: dictionary: key: string, value: string = [
             // Base uris
             'base_uri' -> 'https://api.safaricom.co.ke',
@@ -122,7 +123,67 @@ You can copy the configs below and make them language specific.
             'stk_push' -> '/mpesa/stkpush/v1/processrequest',
             'stk_push_query' -> '/mpesa/stkpushquery/v1/query',
         ];
-    
+
+        // Identifier types
+        const MPESA_IDNTIFIER_TYPE_MSISDN = '1';
+        const MPESA_IDNTIFIER_TYPE_TILL = '2';
+        const MPESA_IDNTIFIER_TYPE_PAYBILL = '4';
+        const MPESA_IDNTIFIER_TYPE_SHORTCODE = '4';
+
+        // Http codes
+        // 2xx series
+        const MPESA_HTTP_OK = 200;
+
+        // 4xx series
+        const MPESA_HTTP_BAD_REQUEST = 400;
+        const MPESA_HTTP_UNATHORIZED = 401;
+        const MPESA_HTTP_FORBIDDDEN = 403;
+        const MPESA_HTTP_NOT_FOUND = 404;
+        const MPESA_HTTP_METHOD_NOT_ALLOWED = 405;
+        const MPESA_HTTP_NOT_ACCEPTABLE = 406;
+        const MPESA_HTTP_TOO_MANY_REQUESTS = 429;
+
+        // 5xx series
+        const MPESA_HTTP_INTERNAL_SERVER_ERROR = 500;
+        const MPESA_HTTP_SERVICE_UNAVAILABLE = 503;
+
+
+        // Gateway to client status code
+        const MPESA_GATEWAY_TO_CLIENT_SUCCESS = 0;
+
+        const MPESA_GATEWAY_TO_CLIENT_INSUFFICIENT_FUNDS = 1;
+
+        const MPESA_GATEWAY_TO_CLIENT_LESS_THAN_MAX_TRANSACTION_VALUE = 2;
+        const MPESA_GATEWAY_TO_CLIENT_MORE_THAN_MAX_TRANSACTION_VALUE = 3;
+
+        const MPESA_GATEWAY_TO_CLIENT_WOULD_EXCEED_DAILY_TRANSFER_LIMIT = 4;
+        const MPESA_GATEWAY_TO_CLIENT_WOULD_EXCEED_MINIMUM_BALANCE = 5;
+
+        const MPESA_GATEWAY_TO_CLIENT_UNRESOLVED_PRIMARY_PARTY = 6;
+        const MPESA_GATEWAY_TO_CLIENT_UNRESOLVED_RECIEVER_PARTY = 7;
+        
+        const MPESA_GATEWAY_TO_CLIENT_WOULD_EXCEED_MAXIMUM_BALANCE = 8;
+
+        const MPESA_GATEWAY_TO_CLIENT_INVALID_DEBIT_ACCOUNT = 11;
+        const MPESA_GATEWAY_TO_CLIENT_INVALID_CREDIT_ACCOUNT = 12;
+
+        const MPESA_GATEWAY_TO_CLIENT_UNRESOLVED_DEBIT_ACCOUNT = 13;
+        const MPESA_GATEWAY_TO_CLIENT_UNRESOLVED_CREDIT_ACCOUNT = 14;
+
+        const MPESA_GATEWAY_TO_CLIENT_DUPLICATE_DETECTED = 15;
+
+        const MPESA_GATEWAY_TO_CLIENT_INTERNAL_FAILURE = 17;
+
+        const MPESA_GATEWAY_TO_CLIENT_UNRESOLVED_INITIATOR = 20;
+
+        const MPESA_GATEWAY_TO_CLIENT_TRAFFIC_BLOCKING_CONDITION_IN_PLACE = 26;
+        
+
+        // Client to gateway status code
+        const MPESA_CLIENT_TO_GATEWAY_SUCCESS_C2B = '0';
+        const MPESA_CLIENT_TO_GATEWAY_SUCCESS_OTHERS = '00000000';
+        const MPESA_CLIENT_TO_GATEWAY_REJECT = '1';
+
     }
 ```
 
@@ -226,6 +287,11 @@ The following are the specifications for the error codes
         // Initialize the error here with the details of the 
         // exception
         constructor(message: string);
+
+        // Gets the error message as string
+        // you may override the default `getMessage` if you wish
+        // examples include, `service temporarily unavailable`
+        public String getMessage();
     }
 
 ```
@@ -243,11 +309,11 @@ The following are the specifications for the error codes
         // Gets the https response status code
         public int getCode();
 
-        // Get's the error body response as string
+        // Gets the error body response as string
         // return empty string if response body is empty
         public String getErrorBody();
 
-        // Get's the error response status message as string
+        // Gets the error response status message as string
         // you may override the default `getMessage()` if you wish
         // examples include, `invalid authentication credentials`
         public String getMessage();
@@ -269,11 +335,11 @@ The following are the specifications for the error codes
         // Gets the https response status code
         public int getCode();
 
-        // Get's the error body response as string
+        // Gets the error body response as string
         // return empty string if response body is empty
         public String getErrorBody();
 
-        // Get's the error response status message as string
+        // Gets the error response status message as string
         // you may override the default `getMessage` if you wish
         // examples include, `service temporarily unavailable`
         public String getMessage();
