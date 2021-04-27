@@ -42,7 +42,7 @@ The following specifies the mpesa endpoints, their data and their expected respo
 - `B2B` - Business to business payments
 - `Account balance query` - Used to check the account balance
 - `Transaction status query` - Used to query the transaction status
-- `Initialize stk push` - Used to initilize an stk push
+- `Initialize stk push` - Used to initialize an stk push
 - `Stk push query` - Used to check the status of an stk push
 - `Reversal` - Used to initiate a reversal request
 
@@ -83,7 +83,7 @@ Method: `POST`
 
 Endpoint: `{base_uri}/oauth/v1/generate?grant_type=client_credentials`
 
-Description: Used to register a callback url/ webhook that will recieve notifications
+Description: Used to register a callback url/ webhook that will receive notifications
 of an mpesa payment. Note that during production this can only be done once
 
 ### _Request format_
@@ -102,8 +102,8 @@ Body:
     {
         "ShortCode": " ", // The short code of the organization.
         "ResponseType": " ", // Default response type for timeout. Can be blank
-        "ConfirmationURL": "http://ip_address:port/confirmation", // Confirmation URL for the client. The URL that recieves the complete transaction
-        "ValidationURL": "http://ip_address:port/validation_url" // Validation URL for the client. URL to recieve requests of validating a transaction, whether to allow a trabsaction to proceed or not
+        "ConfirmationURL": "http://ip_address:port/confirmation", // Confirmation URL for the client. The URL that receives the complete transaction
+        "ValidationURL": "http://ip_address:port/validation_url" // Validation URL for the client. URL to receive requests of validating a transaction, whether to allow a transaction to proceed or not
     }
 ```
 
@@ -127,7 +127,7 @@ Response:
     "LastName":""
   }
   
-  //Confirmation Respose
+  //Confirmation Response
   {
     "TransactionType":"",
     "TransID":"LGR219G3EY",
@@ -404,7 +404,7 @@ Body:
         "CommandID":"AccountBalance", // A unique command passed to the M-Pesa system.
         "PartyA":"shortcode", // 
         "IdentifierType":"4", // 
-        "Remarks":"Remarks", // Comments that are sent along with the transactio
+        "Remarks":"Remarks", // Comments that are sent along with the transaction
         "QueueTimeOutURL":"https://ip_address:port/timeout_url",
         "ResultURL":"https://ip_address:port/result_url"
     }
@@ -499,7 +499,7 @@ Response:
             "Value":"AG_20170727_00004492b1b6d0078fbe"
           },
           {
-            "Key":"FinalisedTime",
+            "Key":"FinalizedTime",
             "Value":20170727101415
           },
           {
@@ -765,7 +765,7 @@ Identifier types - both sender and receiver - identify an M-Pesa transaction’s
 
 ## M-Pesa Result and Response Codes (From gateway to client)
 
-This describes the reponse codes gotten from the gateway
+This describes the response codes gotten from the gateway
 M-Pesa Result Codes
 
 | Result Code | Description
@@ -778,7 +778,7 @@ M-Pesa Result Codes
 | 5            | Would Exceed Minimum Balance          |
 | 6            | Unresolved Primary Party              |
 | 7            | Unresolved Receiver Party             |
-| 8            | Would Exceed Maxiumum Balance         |
+| 8            | Would Exceed Maximum Balance         |
 | 11           | Debit Account Invalid                 |
 | 12           | Credit Account Invalid                |
 | 13           | Unresolved Debit Account              |

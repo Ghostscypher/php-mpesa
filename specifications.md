@@ -3,7 +3,7 @@
 The following describes the main Mpesa class specification standards.
 
 Please check the [example implementation](./example_implementations.md) for a generic pseudocode of the
-implementation of  the sepecifiations below.
+implementation of  the specifications below.
 
 ## Table of contents
 
@@ -28,7 +28,7 @@ implementation of  the sepecifiations below.
   - [Mpesa response class](#mpesa-response-class)
   - [Mpesa client to business (C2B) class](#mpesa-client-to-business-c2b-class)
   - [Mpesa business to business (B2B) client class](#mpesa-business-to-business-b2b-client-class)
-  - [Mpesa bisiness to client (B2C) class](#mpesa-bisiness-to-client-b2c-class)
+  - [Mpesa business to client (B2C) class](#mpesa-business-to-client-b2c-class)
 
 ## The folder structure
 
@@ -53,7 +53,7 @@ creating for example we can have `Mpesa.php`, `Mpesa.cpp`, `Mpesa.py`, etc.
 
 `Main/MpesaHttp.ext` - The MpesaHttp class
 
-`Main/MpesaReponse.ext` - The MpesaResponse class
+`Main/MpesaResponse.ext` - The MpesaResponse class
 
 `Main/MpesaC2B.ext` - The MpesaC2B class
 
@@ -73,9 +73,9 @@ creating for example we can have `Mpesa.php`, `Mpesa.cpp`, `Mpesa.py`, etc.
 
 #### Extras folder
 
-`src/Extras` - The extras folder will be used to store miscelleneous data
+`src/Extras` - The extras folder will be used to store miscellaneous data
 
-`src/Extras/MpesaConstants.ext` - This file will contain all constants related to our libabry
+`src/Extras/MpesaConstants.ext` - This file will contain all constants related to our library
 
 ### Tests folder
 
@@ -125,10 +125,10 @@ You can copy the configs below and make them language specific.
         ];
 
         // Identifier types
-        const MPESA_IDNTIFIER_TYPE_MSISDN = '1';
-        const MPESA_IDNTIFIER_TYPE_TILL = '2';
-        const MPESA_IDNTIFIER_TYPE_PAYBILL = '4';
-        const MPESA_IDNTIFIER_TYPE_SHORTCODE = '4';
+        const MPESA_IDENTIFIER_TYPE_MSISDN = '1';
+        const MPESA_IDENTIFIER_TYPE_TILL = '2';
+        const MPESA_IDENTIFIER_TYPE_PAYBILL = '4';
+        const MPESA_IDENTIFIER_TYPE_SHORTCODE = '4';
 
         // Command ids
         const MPESA_COMMAND_ID_TRANSACTION_REVERSAL = 'TransactionReversal';
@@ -151,8 +151,8 @@ You can copy the configs below and make them language specific.
 
         // 4xx series
         const MPESA_HTTP_BAD_REQUEST = 400;
-        const MPESA_HTTP_UNATHORIZED = 401;
-        const MPESA_HTTP_FORBIDDDEN = 403;
+        const MPESA_HTTP_UNAUTHORIZED = 401;
+        const MPESA_HTTP_FORBIDDEN = 403;
         const MPESA_HTTP_NOT_FOUND = 404;
         const MPESA_HTTP_METHOD_NOT_ALLOWED = 405;
         const MPESA_HTTP_NOT_ACCEPTABLE = 406;
@@ -175,7 +175,7 @@ You can copy the configs below and make them language specific.
         const MPESA_GATEWAY_TO_CLIENT_WOULD_EXCEED_MINIMUM_BALANCE = 5;
 
         const MPESA_GATEWAY_TO_CLIENT_UNRESOLVED_PRIMARY_PARTY = 6;
-        const MPESA_GATEWAY_TO_CLIENT_UNRESOLVED_RECIEVER_PARTY = 7;
+        const MPESA_GATEWAY_TO_CLIENT_UNRESOLVED_RECEIVER_PARTY = 7;
         
         const MPESA_GATEWAY_TO_CLIENT_WOULD_EXCEED_MAXIMUM_BALANCE = 8;
 
@@ -208,7 +208,7 @@ This class is the main entry point into our library. Moreover this class will co
 requests such as
 
 1. Account balance query
-2. Tranasction status query
+2. Transaction status query
 3. Reversal request
 
 The code below shows what is expected to be in the mpesa classes
@@ -222,7 +222,7 @@ class Mpesa {
     private static MpesaC2B C2B;
     private static MpesaB2B B2B;
 
-    // Initialize the class here, also initialize the sibgleton instance
+    // Initialize the class here, also initialize the singleton instance
     // only once
     constructor(config: MpesaConfig); 
 
@@ -247,26 +247,26 @@ class Mpesa {
 
     // Account balance query
     // Optional remarks sent with the request
-    public MpesaReponse checkBalance(optional remarks='remarks': string);
+    public MpesaResponse checkBalance(optional remarks='remarks': string);
 
     // Transaction status, check the transaction status of an mpesa code
     // transaction_id: This is the mpesa code
-    // Remarks: comments sent along with the tranasction
-    // Occasion: additional data sent with the tranasaction
-    public MpesaReponse checkTransactionStatus(
+    // Remarks: comments sent along with the transaction
+    // Occasion: additional data sent with the transaction
+    public MpesaResponse checkTransactionStatus(
         transaction_id: string,
         optional remarks='remarks': string,
         optional occasion='': string
     );
 
     // Initiate reversal request
-    // transaction_id: The npesa code.
+    // transaction_id: The Mpesa code.
     // amount: The amount that is being reversed
-    // receiver_party: the shortcode, or MSISDN that recieved the payment
-    // receiver_identifier_type: constant that shows the reciever identifier type
-    //         possible values are; MPESA_IDNTIFIER_TYPE_MSISDN, MPESA_IDNTIFIER_TYPE_TILL,
-    //                MPESA_IDNTIFIER_TYPE_PAYBILL , MPESA_IDNTIFIER_TYPE_SHORTCODE 
-    public MpesaReponse reverseTransaction(
+    // receiver_party: the shortcode, or MSISDN that received the payment
+    // receiver_identifier_type: constant that shows the receiver identifier type
+    //         possible values are; MPESA_IDENTIFIER_TYPE_MSISDN, MPESA_IDENTIFIER_TYPE_TILL,
+    //                MPESA_IDENTIFIER_TYPE_PAYBILL , MPESA_IDENTIFIER_TYPE_SHORTCODE 
+    public MpesaResponse reverseTransaction(
         transaction_id: string,
         amount: int,
         receiver_party: string,
@@ -368,7 +368,7 @@ The following highlights the requests we are going to make to the mpesa endpoint
 
 ## Mpesa auth class
 
-This is a small helper class whose sole purpose is to store the mpesa authetication credentials, to avoid recreating, the crentials over and over again
+This is a small helper class whose sole purpose is to store the mpesa authentication credentials, to avoid recreating, the credentials over and over again
 
 ```java
 
@@ -377,7 +377,7 @@ class MpesaAuth {
     // Singleton class
     private static MpesaAuth mpesaAuth;
 
-    // Contructor, initialize the singleton class
+    // Constructor, initialize the singleton class
     MpesaAuth();
 
     // Used to generate the consumer keys and secret
@@ -398,8 +398,8 @@ class MpesaAuth {
 
 ## MPesa configuration class
 
-This class will hold a list of cinfigurations that will need to be passed between different classes
-Please note that this class should allowchaining, will also add helper methods for ease of changing
+This class will hold a list of configurations that will need to be passed between different classes
+Please note that this class should allow chaining, will also add helper methods for ease of changing
 configs
 
 ```java
@@ -407,14 +407,14 @@ configs
 class MpesaConfig {
 
     // Default constructor
-    // Set defaukt environment as sandbox
+    // Set default environment as sandbox
     MpesaConfig(); // --> Must be public for java guys
 
-    // This constructor recieves the configuration as an array
+    // This constructor receives the configuration as an array
     // and parses it, dictionary format will be shown below
     MpesaConfig(config: dictionary: key: string, value: any);
 
-    // This constructor recieves the configuration as a string
+    // This constructor receives the configuration as a string
     // and parses it, string format will be shown below
     MpesaConfig(config: string);
 
@@ -453,7 +453,7 @@ class MpesaConfig {
 
     // Used to set the shortcode, this is usually the
     // partyA or partyB depending on the transaction
-    // identidier_type, indicates the kind of shortcode this is
+    // identifier_type, indicates the kind of shortcode this is
     // allowed are IDENTIFIER_TYPE_TILL, IDENTIFIER_TYPE_PAYBILL
     // Allow chaining, see example below
     public MpesaConfig setShortCode(value: string, identifier_type: CONSTANT);
@@ -462,7 +462,7 @@ class MpesaConfig {
     public String getShortCode();
 
     // The business short code is often the head office number
-    // this is usually used to initiate an stk tranasction
+    // this is usually used to initiate an stk transaction
     // if left blank we assume the business short code is the same as
     // short code
     public MpesaConfig setBusinessShortCode(value: string);
@@ -526,10 +526,10 @@ class MpesaConfig {
 
     // Set the password
     // This password will be used in the generation of the security credential
-    // itis also used in initializing stk push requests
+    // it is also used in initializing stk push requests
     public MpesaConfig setPassword(value: string);
 
-    // Returns the mpesa pasword
+    // Returns the mpesa password
     public string getPassword();
 
     // Provides a way of checking if a configuration is set
@@ -546,8 +546,8 @@ class MpesaConfig {
 
 ## Mpesa HTTP client class
 
-This is the class that will contain the logic for sending and recieveing http requests, it is a simple class
-with only one purpose i.e. handle the sending and recieving of http requests, mist classes will inherit from this
+This is the class that will contain the logic for sending and receiving http requests, it is a simple class
+with only one purpose i.e. handle the sending and receiving of http requests, mist classes will inherit from this
 
 ```java
 
@@ -556,13 +556,13 @@ with only one purpose i.e. handle the sending and recieving of http requests, mi
 */
 class MpesaHttp {
 
-    // Cobsrructor pass in the authentication data to be used for each request
+    // Constructor pass in the authentication data to be used for each request
     MpesaHttp(auth: MpesaAuth);
 
     // This will be used to send Http requests
     // The method refers to HTTP method to send this can be GET, POST, PUT, PATCH, DELETE
     // body: The body of the request, this is the data that will be sent with the request
-    // headers: this refers to extra headests that will be sent with the current request
+    // headers: this refers to extra headers that will be sent with the current request
     //         'accept: application/json' and 'cache-control: no-cache' is included by default
     // options: this is any other configurations not included but need to be added for the request
     public MpesaResponse request(
@@ -587,15 +587,15 @@ way of returning the results of a given request, implementation details will be 
 
 class MpesaResponse {
 
-    // Constructor, initialize this with json reponse string,
+    // Constructor, initialize this with json response string,
     // You can parse this to produce key value pairs
-    MpesaReponse(response: string);
+    MpesaResponse(response: string);
 
     // Returns the original json response as string
     // the user can parse this if necessary
     public string getJSONString();
 
-    // Returns a specific key in the json reponse
+    // Returns a specific key in the json response
     // You can use recursive walk to find the key
     // even more efficiently, cache the results of the walk
     // for direct access, the data returned might be of any type including
@@ -645,12 +645,12 @@ class MpesaC2B {
         amount: int, 
         to: string, 
         optional account_reference = '': string, 
-        optinal timestamp = '': string, 
+        optional timestamp = '': string, 
         optional description = '': string);
 
     // Query the mpesa client gateway to check for the status of an STK push
     // We generate our timestamp if it is not filled, timestamp must be in the format 'yyyymmddhhiiss'
-    public MpesaResponse STKPushQuery(checkout_rquest_id: string, optional timestamp = '': string);
+    public MpesaResponse STKPushQuery(checkout_request_id: string, optional timestamp = '': string);
 
 }
 
@@ -667,7 +667,7 @@ class MpesaB2B {
     
     // Constructor
     // Pass in the mpesa config by ref, this configuration will be immutable
-    // command_id will be a constant specifiying the commandID
+    // command_id will be a constant specifying the commandID
     // TODO: Add the supported command ids here
     MpesaB2B(config: MpesaConfig, command_id: CONSTANT);
 
@@ -679,12 +679,12 @@ class MpesaB2B {
 
     // Perform a B2B transaction
     // amount: amount to transact
-    // to: Organization’s short code recieving funds being transacted.
-    // receiver_identifier_type: specifies the indetifier type of the receiver
-    //       supported types incluce: TODO: add supported constants here
+    // to: Organization’s short code receiving funds being transacted.
+    // receiver_identifier_type: specifies the identifier type of the receiver
+    //       supported types include: TODO: add supported constants here
     // account_reference: optional account sent if we are using paybill
     // remarks: comments sent along with the transaction
-    public MpesaRepsonse send(
+    public MpesaResponse send(
         amount: int, 
         to: string,
         receiver_identifier_type: CONSTANT,
@@ -702,7 +702,7 @@ class MpesaB2B {
 
 ```
 
-## Mpesa bisiness to client (B2C) class
+## Mpesa business to client (B2C) class
 
 This class will handle logic of performing B2C related request, it has one method only
 
@@ -712,7 +712,7 @@ This class will handle logic of performing B2C related request, it has one metho
 class MpesaB2C {
     // Constructor
     // Pass in the mpesa config by ref, this configuration will be immutable
-    // command_id will be a constant specifiying the commandID
+    // command_id will be a constant specifying the commandID
     // TODO: Add the supported command ids here
     MpesaB2C(config: MpesaConfig, command_id: CONSTANT);
 
@@ -730,16 +730,16 @@ class MpesaB2C {
 
     // Perform a B2C transaction
     // amount: amount to transact
-    // to: MSISDN recieving funds being transacted.
+    // to: MSISDN receiving funds being transacted.
     // account_reference: optional account sent if we are using paybill
     // remarks: comments sent along with the transaction
-    // occasion: optional description sent along with the tranasction
-    public MpesaRepsonse send(
+    // occasion: optional description sent along with the transaction
+    public MpesaResponse send(
         amount: int, 
         to: string,
         optional account_reference = '': string,
         optional remarks = 'remarks': string,
-        optinal occasion = '': string
+        optional occasion = '': string
     );
 
 }
