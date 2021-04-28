@@ -166,31 +166,36 @@ You can copy the configs below and make them language specific.
         // Gateway to client status code
         const MPESA_GATEWAY_TO_CLIENT_SUCCESS = 0;
 
+        // Fund related
         const MPESA_GATEWAY_TO_CLIENT_INSUFFICIENT_FUNDS = 1;
-
         const MPESA_GATEWAY_TO_CLIENT_LESS_THAN_MAX_TRANSACTION_VALUE = 2;
         const MPESA_GATEWAY_TO_CLIENT_MORE_THAN_MAX_TRANSACTION_VALUE = 3;
-
         const MPESA_GATEWAY_TO_CLIENT_WOULD_EXCEED_DAILY_TRANSFER_LIMIT = 4;
         const MPESA_GATEWAY_TO_CLIENT_WOULD_EXCEED_MINIMUM_BALANCE = 5;
 
+        // User input related
         const MPESA_GATEWAY_TO_CLIENT_UNRESOLVED_PRIMARY_PARTY = 6;
         const MPESA_GATEWAY_TO_CLIENT_UNRESOLVED_RECEIVER_PARTY = 7;
         
+        // Fund
         const MPESA_GATEWAY_TO_CLIENT_WOULD_EXCEED_MAXIMUM_BALANCE = 8;
 
+        // User input
         const MPESA_GATEWAY_TO_CLIENT_INVALID_DEBIT_ACCOUNT = 11;
         const MPESA_GATEWAY_TO_CLIENT_INVALID_CREDIT_ACCOUNT = 12;
 
+        // User input
         const MPESA_GATEWAY_TO_CLIENT_UNRESOLVED_DEBIT_ACCOUNT = 13;
         const MPESA_GATEWAY_TO_CLIENT_UNRESOLVED_CREDIT_ACCOUNT = 14;
 
+        // Server
         const MPESA_GATEWAY_TO_CLIENT_DUPLICATE_DETECTED = 15;
-
         const MPESA_GATEWAY_TO_CLIENT_INTERNAL_FAILURE = 17;
-
+        
+        // User input
         const MPESA_GATEWAY_TO_CLIENT_UNRESOLVED_INITIATOR = 20;
-
+        
+        // Server
         const MPESA_GATEWAY_TO_CLIENT_TRAFFIC_BLOCKING_CONDITION_IN_PLACE = 26;
         
 
@@ -217,14 +222,14 @@ The code below shows what is expected to be in the mpesa classes
 class Mpesa {
 
     // Create singleton instance of the following classes
-    private static MpesaConfig config;
-    private static MpesaB2C B2C;
-    private static MpesaC2B C2B;
-    private static MpesaB2B B2B;
+    protected static MpesaConfig config;
+    protected static MpesaB2C B2C;
+    protected static MpesaC2B C2B;
+    protected static MpesaB2B B2B;
 
     // Initialize the class here, also initialize the singleton instance
     // only once
-    constructor(config: MpesaConfig); 
+    Mpesa(config: MpesaConfig); 
 
     // Gets the Mpesa config singleton instance and allows a user to change the configurations before next
     // request
@@ -302,7 +307,7 @@ The following are the specifications for the error codes
     {
         // Initialize the error here with the details of the 
         // exception
-        constructor(message: string);
+        MpesaInternalException(message: string);
 
         // Gets the error message as string
         // you may override the default `getMessage` if you wish
@@ -320,7 +325,7 @@ The following are the specifications for the error codes
     {
         // Initialize the error here with the details of the 
         // exception
-        constructor(message: string);
+        MpesaClientException(message: string);
 
         // Gets the https response status code
         public int getCode();
@@ -346,7 +351,7 @@ The following are the specifications for the error codes
     {
         // Initialize the error here with the details of the 
         // exception
-        constructor(message: string);
+        MpesaServerException(message: string);
 
         // Gets the https response status code
         public int getCode();
@@ -375,13 +380,23 @@ This is a small helper class whose sole purpose is to store the mpesa authentica
 class MpesaAuth {
 
     // Singleton class
-    private static MpesaAuth mpesaAuth;
+    protected static MpesaAuth mpesaAuth;
 
     // Constructor, initialize the singleton class
-    MpesaAuth();
+    MpesaAuth(config: MpesaConfig);
 
-    // Used to generate the consumer keys and secret
-    public static MpesaAuth getAuthToken(consumer_key: string, consumer_secret: string);
+    // Used to override the token initially set,
+    // this is useful when one wishes to use a token
+    // from database, it is highly advisable for the user
+    // to store the token in database, to avoid refreshing the
+    // token for each request.
+    // token: token to set
+    // expires_at_timestamp: UNIX timestamp to indicate when
+    // token will expire
+    public MpesaAuth setAuthToken(token: string, expires_at_timestamp: long/int);
+
+    // Used to generate token from consumer keys and secret
+    public MpesaAuth getAuthToken();
 
     // Check whether the credentials has expired
     public boolean hasExpired();
@@ -391,6 +406,11 @@ class MpesaAuth {
 
     // Return the authentication token
     public String getToken();
+
+    // Will return true if the token has changed, useful when one
+    // wants to find out if the token they set from database has changed with the current
+    // request
+    public boolean hasTokenChanged();
 
 }
 
@@ -444,7 +464,12 @@ class MpesaConfig {
     public String getConsumerSecret();
 
     // Generates the credentials and returns it
-    public String getCredential();
+    public String getCredentials();
+
+    // This will override the default auth class
+    // Useful in the situation where authentication data might be stored in the
+    // database, therefore no need to regenerate new auth token
+    public MpesaConfig setAuth(auth: MpesaAuth);
 
     // Gets the authentication token as a key value pair
     // token: auth token
@@ -461,6 +486,9 @@ class MpesaConfig {
     // Return the shortcode
     public String getShortCode();
 
+    // Return the identifier type
+    public String getIdentifierType();
+
     // The business short code is often the head office number
     // this is usually used to initiate an stk transaction
     // if left blank we assume the business short code is the same as
@@ -468,10 +496,7 @@ class MpesaConfig {
     public MpesaConfig setBusinessShortCode(value: string);
 
     // Return the business short code
-    public string getBusinessShortCode();
-
-    // Return the identifier type
-    public String getIdentifierType();
+    public String getBusinessShortCode();
 
     // Used to set the confirmationURL
     // Allow chaining, see example below
@@ -496,7 +521,7 @@ class MpesaConfig {
 
     // Used to set the resultURL
     // Allow chaining, see example below
-    public MpesaConfig setValidationURL(value: string);
+    public MpesaConfig setResultURL(value: string);
 
     // Return the resultURL
     public String getResultURL();
@@ -510,7 +535,7 @@ class MpesaConfig {
 
     // Helper method to get the UTL via url name
     // see example usage below
-    public String url(name: string); 
+    public String getUrl(name: string); 
 
     // Used to set the initiator name/same to initiator
     // Allow chaining, see example below
@@ -537,7 +562,8 @@ class MpesaConfig {
     public boolean isConfigSet(key: string);
     public boolean exists(key: string);
 
-    // Provides redundant way of getting a specific configuration easily
+    // Provides redundant way of setting and getting a specific configuration easily
+    public MpesaConfig setConfig(key: string, value: string);
     public String getConfig(key: string);
 
 }

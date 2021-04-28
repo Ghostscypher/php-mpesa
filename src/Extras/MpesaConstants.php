@@ -5,8 +5,8 @@ namespace HackDelta\Mpesa\Extras;
 /**
  * This class stores constants that will be used throughout the mpesa app
  */
-class MpesaConstants
-{
+class MpesaConstants {
+    
     /**
      * Defines the mpesa endpoints
     */
@@ -39,8 +39,84 @@ class MpesaConstants
 
     ];
 
-    /**
-     * 
-    */
+    // Identifier types
+    public const MPESA_IDENTIFIER_TYPE_MSISDN = '1';
+    public const MPESA_IDENTIFIER_TYPE_TILL = '2';
+    public const MPESA_IDENTIFIER_TYPE_PAYBILL = '4';
+    public const MPESA_IDENTIFIER_TYPE_SHORTCODE = '4';
+
+    // Command ids
+    public const MPESA_COMMAND_ID_TRANSACTION_REVERSAL = 'TransactionReversal';
+    public const MPESA_COMMAND_ID_SALARY_PAYMENT = 'SalaryPayment';
+    public const MPESA_COMMAND_ID_BUSINESS_PAYMENT = 'BusinessPayment';
+    public const MPESA_COMMAND_ID_PROMOTION_PAYMENT = 'PromotionPayment';
+    public const MPESA_COMMAND_ID_ACCOUNT_BALANCE = 'AccountBalance';
+    public const MPESA_COMMAND_ID_CUSTOMER_PAYBILL_ONLINE = 'CustomerPayBillOnline';
+    public const MPESA_COMMAND_ID_TRANSACTION_STATUS_QUERY = 'TransactionStatusQuery';
+    public const MPESA_COMMAND_ID_CHECK_IDENTITY = 'CheckIdentity';
+    public const MPESA_COMMAND_ID_BUSINESS_PAY_BILL = 'BusinessPayBill';
+    public const MPESA_COMMAND_ID_BUSINESS_PAY_BUY_GOODS = 'BusinessBuyGoods';
+    public const MPESA_COMMAND_ID_DISBURSE_FUNDS_TO_BUSINESS = 'DisburseFundsToBusiness';
+    public const MPESA_COMMAND_ID_BUSINESS_TO_BUSINESS_TRANSFER = 'BusinessToBusinessTransfer';
+    public const MPESA_COMMAND_ID_TRANSFER_FROM_MMF_TO_UTILITY = 'BusinessTransferFromMMFToUtility';
+
+    // Http codes
+    // 2xx series
+    public const MPESA_HTTP_OK = 200;
+
+    // 4xx series
+    public const MPESA_HTTP_BAD_REQUEST = 400;
+    public const MPESA_HTTP_UNAUTHORIZED = 401;
+    public const MPESA_HTTP_FORBIDDEN = 403;
+    public const MPESA_HTTP_NOT_FOUND = 404;
+    public const MPESA_HTTP_METHOD_NOT_ALLOWED = 405;
+    public const MPESA_HTTP_NOT_ACCEPTABLE = 406;
+    public const MPESA_HTTP_TOO_MANY_REQUESTS = 429;
+
+    // 5xx series
+    public const MPESA_HTTP_INTERNAL_SERVER_ERROR = 500;
+    public const MPESA_HTTP_SERVICE_UNAVAILABLE = 503;
+
+
+    // Gateway to client status code
+    public const MPESA_GATEWAY_TO_CLIENT_SUCCESS = 0;
+
+    // Fund related
+    public const MPESA_GATEWAY_TO_CLIENT_INSUFFICIENT_FUNDS = 1;
+    public const MPESA_GATEWAY_TO_CLIENT_LESS_THAN_MAX_TRANSACTION_VALUE = 2;
+    public const MPESA_GATEWAY_TO_CLIENT_MORE_THAN_MAX_TRANSACTION_VALUE = 3;
+    public const MPESA_GATEWAY_TO_CLIENT_WOULD_EXCEED_DAILY_TRANSFER_LIMIT = 4;
+    public const MPESA_GATEWAY_TO_CLIENT_WOULD_EXCEED_MINIMUM_BALANCE = 5;
+
+    // User input related
+    public const MPESA_GATEWAY_TO_CLIENT_UNRESOLVED_PRIMARY_PARTY = 6;
+    public const MPESA_GATEWAY_TO_CLIENT_UNRESOLVED_RECEIVER_PARTY = 7;
+    
+    // Fund
+    public const MPESA_GATEWAY_TO_CLIENT_WOULD_EXCEED_MAXIMUM_BALANCE = 8;
+
+    // User input
+    public const MPESA_GATEWAY_TO_CLIENT_INVALID_DEBIT_ACCOUNT = 11;
+    public const MPESA_GATEWAY_TO_CLIENT_INVALID_CREDIT_ACCOUNT = 12;
+
+    // User input
+    public const MPESA_GATEWAY_TO_CLIENT_UNRESOLVED_DEBIT_ACCOUNT = 13;
+    public const MPESA_GATEWAY_TO_CLIENT_UNRESOLVED_CREDIT_ACCOUNT = 14;
+
+    // Server
+    public const MPESA_GATEWAY_TO_CLIENT_DUPLICATE_DETECTED = 15;
+    public const MPESA_GATEWAY_TO_CLIENT_INTERNAL_FAILURE = 17;
+    
+    // User input
+    public const MPESA_GATEWAY_TO_CLIENT_UNRESOLVED_INITIATOR = 20;
+    
+    // Server
+    public const MPESA_GATEWAY_TO_CLIENT_TRAFFIC_BLOCKING_CONDITION_IN_PLACE = 26;
+    
+
+    // Client to gateway status code
+    public const MPESA_CLIENT_TO_GATEWAY_SUCCESS_C2B = '0';
+    public const MPESA_CLIENT_TO_GATEWAY_SUCCESS_OTHERS = '00000000';
+    public const MPESA_CLIENT_TO_GATEWAY_REJECT = '1';
 
 }
