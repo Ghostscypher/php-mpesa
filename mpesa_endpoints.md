@@ -81,7 +81,7 @@ Response:
 
 Method: `POST`
 
-Endpoint: `{base_uri}/oauth/v1/generate?grant_type=client_credentials`
+Endpoint: `{base_uri}/mpesa/c2b/v1/registerurl`
 
 Description: Used to register a callback url/ webhook that will receive notifications
 of an mpesa payment. Note that during production this can only be done once

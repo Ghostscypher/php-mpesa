@@ -10,10 +10,19 @@ use Exception;
  * This is the 4xx error code series.
  * This will wrap around the guzzle client error exception
  */
-class MpesaClientException extends Exception {
+class MpesaClientException extends Exception 
+{
+    protected string $error_body = '';
+    protected int $status_code = 0;
 
-    public function __construct(string $message = "") {
+    public function __construct(string $message, string $error_body, int $status_code) 
+    {
         parent::__construct($message);
+
+        $this->error_body = $error_body;
+        $this->status_code = $status_code;
     }
+
+    
 
 }

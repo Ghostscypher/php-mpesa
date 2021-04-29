@@ -1,4 +1,5 @@
-<?
+<?php
+
 namespace HackDelta\Mpesa\Main;
 
 use HackDelta\Mpesa\Exceptions\MpesaInternalException;
@@ -118,7 +119,7 @@ class MpesaConfig
                     );
                 }
 
-                $this->config[$key] = $config[$value]; 
+                $this->config[$key] = trim($config[$value]);
             }
 
         }
@@ -619,6 +620,36 @@ class MpesaConfig
         }
 
         return $this->config[$key];
+    }
+
+    /**
+     * Returns the baseURI/baseURL based on whether the library is in production mode
+     *  or not
+     * 
+     * @return string The base URI/URL
+     */ 
+    public function getBaseURL(): string
+    {
+        return $this->isSandboxEnvironment() ? 
+            MpesaConstants::MPESA_URIS['sandbox_base_uri'] :
+            MpesaConstants::MPESA_URIS['base_uri'];
+    }
+
+    /**
+     * Gets a clean URL with stripped '/' on the end
+     * 
+     * @param string $base_url The base URI/ base URL
+     * @param string $path The path
+     * 
+     * @return string The cleaned URL
+     */
+    public static function makeURL(string $base_url, string $path)
+    {
+        return sprintf(
+            "%s/%s", 
+            rtrim( trim($base_url), '/'), 
+            rtrim( trim($path), '/') 
+        );
     }
 
 }

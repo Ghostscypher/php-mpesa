@@ -11,8 +11,18 @@ use Exception;
 */
 class MpesaInternalException extends Exception {
 
-    public function __construct(string $message = "") {
+    public function __construct(string $message) {
         parent::__construct($message);
+    }
+
+    public function getStatusCode(): int
+    {
+        return $this->status_code;
+    }
+
+    public function getErrorBody(): string
+    {
+        return $this->error_body;
     }
 
 }

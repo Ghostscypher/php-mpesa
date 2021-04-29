@@ -222,7 +222,6 @@ The code below shows what is expected to be in the mpesa classes
 class Mpesa {
 
     // Create singleton instance of the following classes
-    protected static MpesaConfig config;
     protected static MpesaB2C B2C;
     protected static MpesaC2B C2B;
     protected static MpesaB2B B2B;
@@ -324,11 +323,13 @@ The following are the specifications for the error codes
     class MpesaClientException extends Exception
     {
         // Initialize the error here with the details of the 
+        // error_body: the error body JSON returned
+        // status_code: The http error status code for the client e.g. 400, 401, 403 etc
         // exception
-        MpesaClientException(message: string);
+        MpesaClientException(message: string, error_body: string, status_code: int);
 
         // Gets the https response status code
-        public int getCode();
+        public int getStatusCode();
 
         // Gets the error body response as string
         // return empty string if response body is empty
@@ -350,11 +351,13 @@ The following are the specifications for the error codes
     class MpesaServerException extends Exception
     {
         // Initialize the error here with the details of the 
+        // error_body: the error body JSON returned
+        // status_code: The http error status code for the server e.g. 500, 503 etc
         // exception
-        MpesaServerException(message: string);
+        MpesaServerException(message: string, error_body: string, status_code: int);
 
         // Gets the https response status code
-        public int getCode();
+        public int getStatusCode();
 
         // Gets the error body response as string
         // return empty string if response body is empty
@@ -396,7 +399,9 @@ class MpesaAuth {
     public MpesaAuth setAuthToken(token: string, expires_at_timestamp: long/int);
 
     // Used to generate token from consumer keys and secret
-    public MpesaAuth getAuthToken();
+    // Use force to generate new token irregardless of whether
+    // the token has expired or not
+    public MpesaAuth getAuthToken(optional force: boolean);
 
     // Check whether the credentials has expired
     public boolean hasExpired();
@@ -566,6 +571,14 @@ class MpesaConfig {
     public MpesaConfig setConfig(key: string, value: string);
     public String getConfig(key: string);
 
+    // Returns the baseURI/baseURL based on whether the library is in production mode
+    // or not
+    public String getBaseURL();
+
+    // Provides a utility method of combining two URLS to provide
+    // a clean URL
+    public static String makeURL(base_url: string, path: string);
+
 }
 
 ```
@@ -580,22 +593,19 @@ with only one purpose i.e. handle the sending and receiving of http requests, mi
 /**
 * This class shouldn't be called directly and is for internal use only
 */
-class MpesaHttp {
-
-    // Constructor pass in the authentication data to be used for each request
-    MpesaHttp(auth: MpesaAuth);
-
+class MpesaHttp 
+{
     // This will be used to send Http requests
     // The method refers to HTTP method to send this can be GET, POST, PUT, PATCH, DELETE
     // body: The body of the request, this is the data that will be sent with the request
     // headers: this refers to extra headers that will be sent with the current request
     //         'accept: application/json' and 'cache-control: no-cache' is included by default
-    // options: this is any other configurations not included but need to be added for the request
     public MpesaResponse request(
-        method: string, 
+        method: string,
+        url: string,
         optional body: dictionary(key: string, value: string) = null,
-        optional dictionary(key: string, value: string) = null, 
-        optional dictionary(key: string, value: string) = null
+        optional headers: dictionary(key: string, value: string) = null, 
+        optional options: dictionary(key: string, value: string) = null
     );
 
     // Include any number of helper methods you might find necessary
@@ -615,18 +625,17 @@ class MpesaResponse {
 
     // Constructor, initialize this with json response string,
     // You can parse this to produce key value pairs
-    MpesaResponse(response: string);
+    // Both response body and response headers are expected to be JSON
+    // string, it is important that they are passed in this format
+    // for the sake of uniformity across different languages
+    MpesaResponse(response_body: string, response_headers: string, status_code: int);
 
     // Returns the original json response as string
     // the user can parse this if necessary
     public string getJSONString();
 
-    // Returns a specific key in the json response
-    // You can use recursive walk to find the key
-    // even more efficiently, cache the results of the walk
-    // for direct access, the data returned might be of any type including
-    // another response
-    public any get(key: string);
+    // Return the headers as JSON string
+    public string getHeadersJSONString();
 
 }
 
@@ -676,7 +685,10 @@ class MpesaC2B {
 
     // Query the mpesa client gateway to check for the status of an STK push
     // We generate our timestamp if it is not filled, timestamp must be in the format 'yyyymmddhhiiss'
-    public MpesaResponse STKPushQuery(checkout_request_id: string, optional timestamp = '': string);
+    public MpesaResponse STKPushQuery(
+        checkout_request_id: string, 
+        optional timestamp = '': string
+    );
 
 }
 
@@ -703,6 +715,12 @@ class MpesaB2B {
     // Return the current config
     public MpesaConfig getConfig();
 
+    // Replace the current command id
+    public MpesaB2B setCommandID(command_id: CONSTANT);
+
+    // Returns the current command ID
+    public string getCommandID();
+
     // Perform a B2B transaction
     // amount: amount to transact
     // to: Organization’s short code receiving funds being transacted.
@@ -717,12 +735,6 @@ class MpesaB2B {
         optional account_reference = '': string,
         optional remarks = 'remarks': string
     );
-
-    // Replace the current command id
-    public MpesaB2B setCommandID(command_id: CONSTANT);
-
-    // Returns the current command ID
-    public string getCommandID();
 
 }
 
