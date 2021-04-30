@@ -4,6 +4,7 @@ namespace HackDelta\Mpesa\Main;
 
 use HackDelta\Mpesa\Exceptions\MpesaInternalException;
 use HackDelta\Mpesa\Extras\MpesaConstants;
+use HackDelta\Mpesa\Extras\Validatable;
 
 /**
  * This class will contain methods for generating authentication tokens, and managing the
@@ -11,22 +12,21 @@ use HackDelta\Mpesa\Extras\MpesaConstants;
  */
 class MpesaAuth 
 {
+    use Validatable;
+
     protected MpesaConfig $config;
     protected int $expires_at = 0;
     protected string $token = '';
     protected bool $has_token_changed = false;
+
     protected static ?MpesaHttp $http_client = null;
 
     public function __construct(MpesaConfig $config)
     {
-        // Check to see if the consumer key and consumer secret are set
-        if( $config->getConsumerKey() === '' || $config->getConsumerKey() === '' ) {
-            throw new MpesaInternalException(
-                "Consumer key or consumer secret empty"
-            );
-        }
+        $this->validateString( 'Consumer key', $config->getConsumerKey() );
+        $this->validateString( 'Consumer secret', $config->getConsumerSecret() );
 
-        if( self::$http_client === null ) { self::$http_client = new MpesaAuth($this->config); }
+        if( self::$http_client === null ) { self::$http_client = new MpesaHttp($this->config); }
 
         $this->config = $config;
     }
@@ -37,6 +37,21 @@ class MpesaAuth
         $this->expires_at = $expires_at_timestamp;
 
         return $this;
+    }
+
+    public function setConfig(MpesaConfig $config): self 
+    {
+        $this->validateString( 'consumer_key', $config->getConsumerKey() );
+        $this->validateString( 'consumer_secret', $config->getConsumerSecret() );
+
+        $this->config = $config;
+
+        return $this;
+    }
+
+    public function getConfig(): MpesaConfig
+    {
+        return $this->config;
     }
 
     private function refreshToken(): void 
@@ -95,6 +110,9 @@ class MpesaAuth
 
     public function getToken(): string
     {
+        // Will refresh token if it has expired
+        $this->getAuthToken();
+
         return $this->token;
     }
 

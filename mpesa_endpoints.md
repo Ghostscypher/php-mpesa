@@ -577,7 +577,8 @@ Body:
     "SecurityCredential":" ", // Base64 encoded string of the M-Pesa short code and password, which is encrypted using M-Pesa public key and validates the transaction on M-Pesa Core system.
     "CommandID":"TransactionReversal", //  	Unique command for each transaction type, possible values are: TransactionReversal.
     "TransactionID":" ", // Organization/MSISDN sending the transaction.
-    "Amount":" ", // 
+    "Amount":" ", //
+    "PartyA": " ", // Organization/MSISDN sending the transaction.
     "ReceiverParty":" ", // Type of organization receiving the transaction.
     "RecieverIdentifierType":"4",
     "ResultURL":"https://ip_address:port/result_url",

@@ -10,6 +10,7 @@ implementation of  the specifications below.
 - [Specifications](#specifications)
   - [Table of contents](#table-of-contents)
   - [The folder structure](#the-folder-structure)
+    - [certificates folder](#certificates-folder)
     - [src folder](#src-folder)
       - [Main folder](#main-folder)
       - [Exceptions folder](#exceptions-folder)
@@ -36,6 +37,16 @@ Here is the folder structure of the applications, for more details about what ea
 below.
 Please note that the `.ext` is a generic extension which stands for the file extension of the library you are
 creating for example we can have `Mpesa.php`, `Mpesa.cpp`, `Mpesa.py`, etc.
+
+### certificates folder
+
+Here we will store the Mpesa certificates that will be used to generate security
+credential for those requests that require the credential
+You can copy the certificates from the [Certificates folder]('./../certificates')
+
+`sandbox.cer` - The Mpesa certificate for sandbox environment
+
+`production.cer` - The mpesa live APIs sandbox
 
 ### src folder
 
@@ -137,6 +148,7 @@ You can copy the configs below and make them language specific.
         const MPESA_COMMAND_ID_PROMOTION_PAYMENT = 'PromotionPayment';
         const MPESA_COMMAND_ID_ACCOUNT_BALANCE = 'AccountBalance';
         const MPESA_COMMAND_ID_CUSTOMER_PAYBILL_ONLINE = 'CustomerPayBillOnline';
+        const MPESA_COMMAND_ID_CUSTOMER_BUY_GOODS_ONLINE = 'CustomerBuyGoodsOnline';
         const MPESA_COMMAND_ID_TRANSACTION_STATUS_QUERY = 'TransactionStatusQuery';
         const MPESA_COMMAND_ID_CHECK_IDENTITY = 'CheckIdentity';
         const MPESA_COMMAND_ID_BUSINESS_PAY_BILL = 'BusinessPayBill';
@@ -144,6 +156,11 @@ You can copy the configs below and make them language specific.
         const MPESA_COMMAND_ID_DISBURSE_FUNDS_TO_BUSINESS = 'DisburseFundsToBusiness';
         const MPESA_COMMAND_ID_BUSINESS_TO_BUSINESS_TRANSFER = 'BusinessToBusinessTransfer';
         const MPESA_COMMAND_ID_TRANSFER_FROM_MMF_TO_UTILITY = 'BusinessTransferFromMMFToUtility';
+        const MPESA_COMMAND_ID_MERCHANT_TO_MERCHANT_TRANSFER = 'MerchantToMerchantTransfer';
+        const MPESA_COMMAND_ID_MERCHANT_FROM_MERCHANT_TO_WORKING = 'MerchantTransferFromMerchantToWorking';
+        const MPESA_COMMAND_ID_MERCHANT_TO_MMF = 'MerchantServicesMMFAccountTransfer';
+        const MPESA_COMMAND_ID_AGENCY_FLOAT_ADVANCE = 'AgencyFloatAdvance';
+
 
         // Http codes
         // 2xx series
@@ -230,9 +247,13 @@ class Mpesa {
     // only once
     Mpesa(config: MpesaConfig); 
 
-    // Gets the Mpesa config singleton instance and allows a user to change the configurations before next
-    // request
-    public MpesaConfig config();
+    // Allows a user to override the current config
+    // options
+    public Mpesa setConfig(config: MpesaConfig);
+
+    // Gets the Mpesa config singleton instance and allows a 
+    // user to change the configurations before the next request
+    public MpesaConfig getConfig();
 
     // Returns an instance of the MpesaC2B class
     public MpesaC2B C2B();
@@ -260,7 +281,7 @@ class Mpesa {
     public MpesaResponse checkTransactionStatus(
         transaction_id: string,
         optional remarks='remarks': string,
-        optional occasion='': string
+        optional occasion=' ': string
     );
 
     // Initiate reversal request
@@ -276,7 +297,7 @@ class Mpesa {
         receiver_party: string,
         receiver_identifier_type: CONSTANT,
         optional remarks='remarks': string,
-        optional occasion='': string
+        optional occasion=' ': string
     );
 
 }
@@ -397,6 +418,13 @@ class MpesaAuth {
     // expires_at_timestamp: UNIX timestamp to indicate when
     // token will expire
     public MpesaAuth setAuthToken(token: string, expires_at_timestamp: long/int);
+
+    // Sets thc config, will override the current config
+    // Remember to validate the data
+    public MpesaAuth setConfig(config: MpesaConfig);
+
+    // Returns the current config
+    public MpesaConfig getConfig();
 
     // Used to generate token from consumer keys and secret
     // Use force to generate new token irregardless of whether
@@ -557,10 +585,19 @@ class MpesaConfig {
     // Set the password
     // This password will be used in the generation of the security credential
     // it is also used in initializing stk push requests
-    public MpesaConfig setPassword(value: string);
+    public MpesaConfig setPasskey(value: string);
 
     // Returns the mpesa password
-    public string getPassword();
+    public String getPasskey();
+
+    // Returns the mpesa password
+    public String getPassWord(timestamp: string);
+
+    // Returns the security credential
+    // Base64 encoded string of the M-Pesa short code and password, 
+    // which is encrypted using M-Pesa public key and validates the 
+    // transaction on M-Pesa Core system.
+    public String getSecurityCredential();
 
     // Provides a way of checking if a configuration is set
     // exists is an alias for isConfigSet
@@ -669,7 +706,9 @@ class MpesaC2B {
 
     // Simulate a transaction, this is only available in sandbox 
     // amount is an unsigned int always check for negative or 0
-    public MpesaResponse simulate(MSISDN: string, amount :int);
+    // Account reference is used as the account number for paybill, will be ignored, 
+    // when using till
+    public MpesaResponse simulate(MSISDN: string, amount :int, optional account_reference = '': string);
 
     // Initiate STK push query
     // amount: is an unsigned int always check for negative or 0
@@ -706,20 +745,13 @@ class MpesaB2B {
     // Constructor
     // Pass in the mpesa config by ref, this configuration will be immutable
     // command_id will be a constant specifying the commandID
-    // TODO: Add the supported command ids here
-    MpesaB2B(config: MpesaConfig, command_id: CONSTANT);
+    MpesaB2B(config: MpesaConfig);
 
     // Used to overwrite the default config set 
     public MpesaB2B setConfig(config: MpesaConfig);
 
     // Return the current config
     public MpesaConfig getConfig();
-
-    // Replace the current command id
-    public MpesaB2B setCommandID(command_id: CONSTANT);
-
-    // Returns the current command ID
-    public string getCommandID();
 
     // Perform a B2B transaction
     // amount: amount to transact
@@ -731,6 +763,7 @@ class MpesaB2B {
     public MpesaResponse send(
         amount: int, 
         to: string,
+        command_id: CONSTANT,
         receiver_identifier_type: CONSTANT,
         optional account_reference = '': string,
         optional remarks = 'remarks': string
@@ -752,7 +785,7 @@ class MpesaB2C {
     // Pass in the mpesa config by ref, this configuration will be immutable
     // command_id will be a constant specifying the commandID
     // TODO: Add the supported command ids here
-    MpesaB2C(config: MpesaConfig, command_id: CONSTANT);
+    MpesaB2C(config: MpesaConfig);
 
     // Used to overwrite the default config set 
     public MpesaB2C setConfig(config: MpesaConfig);
@@ -760,22 +793,17 @@ class MpesaB2C {
     // Return the current config
     public MpesaConfig getConfig();
 
-    // Replace the current command id
-    public MpesaB2C setCommandID(command_id: CONSTANT);
-
-    // Returns the current command ID
-    public string getCommandID();
-
     // Perform a B2C transaction
     // amount: amount to transact
     // to: MSISDN receiving funds being transacted.
+    // command IDs
     // account_reference: optional account sent if we are using paybill
     // remarks: comments sent along with the transaction
     // occasion: optional description sent along with the transaction
     public MpesaResponse send(
         amount: int, 
         to: string,
-        optional account_reference = '': string,
+        command_id: CONSTANT,
         optional remarks = 'remarks': string,
         optional occasion = '': string
     );

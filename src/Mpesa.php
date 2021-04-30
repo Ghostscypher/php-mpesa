@@ -2,31 +2,50 @@
 
 namespace HackDelta\Mpesa;
 
+use HackDelta\Mpesa\Extras\MpesaConstants;
+use HackDelta\Mpesa\Extras\Validatable;
 use HackDelta\Mpesa\Main\MpesaB2B;
 use HackDelta\Mpesa\Main\MpesaB2C;
 use HackDelta\Mpesa\Main\MpesaC2B;
 use HackDelta\Mpesa\Main\MpesaConfig;
 use HackDelta\Mpesa\Main\MpesaHttp;
+use HackDelta\Mpesa\Main\MpesaResponse;
 
 /**
  * The main class that will be instantiated
  */
 class Mpesa 
 {
+    use Validatable;
+
     protected static ?MpesaHttp $http_client = null;
     
     protected static ?MpesaB2C $B2C = null;
     protected static ?MpesaC2B $C2B = null;
     protected static ?MpesaB2B $B2B = null;
 
-    protected ?MpesaConfig $config = null;
+    protected MpesaConfig $config;
 
     public function __construct(MpesaConfig $config)
     {
         $this->config = $config;
+
+        if( self::$http_client === null ) { self::$http_client = new MpesaHttp($this->config); }
     }
 
-    public function config(): MpesaConfig
+    public function setConfig(MpesaConfig $config): self
+    {
+        $this->config = $config;
+
+        // Change the other classes config to
+        $this->B2B()->setConfig($config);
+        $this->B2C()->setConfig($config);
+        $this->C2B()->setConfig($config);
+
+        return $this;
+    }
+
+    public function getConfig(): MpesaConfig
     {
         return $this->config;
     }
@@ -48,7 +67,7 @@ class Mpesa
     public function B2C(): MpesaB2C
     {
         return self::$B2C === null ?
-            new MpesaC2B($this->config) :
+            new MpesaB2C($this->config) :
             self::$B2C;
     }
 
@@ -56,6 +75,40 @@ class Mpesa
     // Optional remarks sent with the request
     public function checkBalance(string $remarks='remarks'): MpesaResponse
     {
+        $url = sprintf(
+            "%s%s", 
+            $this->config->getBaseURL(), 
+            MpesaConstants::MPESA_URIS['account_balance']
+        );
+
+        // Validate that data is correct
+        $this->validateString( 'initiator_name', $this->config->getInitiator() );
+        $this->validateString( 'security_credential', $this->config->getSecurityCredential() );
+        $this->validateString( 'short_code', $this->config->getShortCode() );
+        $this->validateString( 'queue_timeout_url', $this->config->getQueueTimeoutURL() );
+        $this->validateString( 'result_url', $this->config->getResultURL() );
+
+        $this->validateString( 'remarks', $remarks );
+
+        $response = self::$http_client->request(
+            uri: $url,
+            method: 'POST',
+            body: [
+                'Initiator' => $this->config->getInitiator(),
+                'SecurityCredential' => $this->config->getSecurityCredential(),
+                'CommandID' => MpesaConstants::MPESA_COMMAND_ID_ACCOUNT_BALANCE,
+                'PartyA' => $this->config->getShortCode(),
+                'IdentifierType' => $this->config->getIdentifierType(),
+                'Remarks' => $remarks,
+                'QueueTimeOutURL' => $this->config->getQueueTimeoutURL(),
+                'ResultURL' => $this->config->getResultURL(),
+            ],
+            headers: [
+                'Authorization' => sprintf("Bearer %s", $this->config->getAuth()->getToken() )
+            ]
+        );
+
+        return $response;
 
     }
 
@@ -66,9 +119,46 @@ class Mpesa
     public function checkTransactionStatus(
         string $transaction_id,
         string $remarks='remarks',
-        string $occasion=''
+        string $occasion=' ',
     ): MpesaResponse
     {
+        $url = sprintf(
+            "%s%s", 
+            $this->config->getBaseURL(), 
+            MpesaConstants::MPESA_URIS['transaction_status']
+        );
+
+        // Validate that data is correct
+        $this->validateString( 'initiator_name', $this->config->getInitiator() );
+        $this->validateString( 'security_credential', $this->config->getSecurityCredential() );
+        $this->validateString( 'transaction_id', $transaction_id );
+        $this->validateString( 'short_code', $this->config->getShortCode() );
+        $this->validateString( 'queue_timeout_url', $this->config->getQueueTimeoutURL() );
+        $this->validateString( 'result_url', $this->config->getResultURL() );
+
+        $this->validateString( 'remarks', $remarks );
+
+        $response = self::$http_client->request(
+            uri: $url,
+            method: 'POST',
+            body: [
+                'Initiator' => $this->config->getInitiator(),
+                'SecurityCredential' => $this->config->getSecurityCredential(),
+                'CommandID' => MpesaConstants::MPESA_COMMAND_ID_TRANSACTION_STATUS_QUERY,
+                'TransactionID' => $transaction_id,
+                'PartyA' => $this->config->getShortCode(),
+                'IdentifierType' => $this->config->getIdentifierType(),
+                'Remarks' => $remarks,
+                'QueueTimeOutURL' => $this->config->getQueueTimeoutURL(),
+                'ResultURL' => $this->config->getResultURL(),
+                'Occasion' => $occasion,
+            ],
+            headers: [
+                'Authorization' => sprintf("Bearer %s", $this->config->getAuth()->getToken() )
+            ]
+        );
+
+        return $response;
 
     }
 
@@ -88,7 +178,55 @@ class Mpesa
         string $occasion=''
     ): MpesaResponse
     {
+        $url = sprintf(
+            "%s%s", 
+            $this->config->getBaseURL(), 
+            MpesaConstants::MPESA_URIS['reversal']
+        );
 
+        // Validate that data is correct
+        $this->validateString( 'initiator_name', $this->config->getInitiator() );
+        $this->validateString( 'security_credential', $this->config->getSecurityCredential() );
+        $this->validateString( 'transaction_id', $transaction_id );
+        $this->validateInt('amount', $amount, 1);
+        $this->validateString( 'reciever_party', $receiver_party );
+
+        $this->validateArray('reciever_identifier_type', $receiver_identifier_type, [
+            MpesaConstants::MPESA_IDENTIFIER_TYPE_MSISDN,
+            MpesaConstants::MPESA_IDENTIFIER_TYPE_PAYBILL,
+            MpesaConstants::MPESA_IDENTIFIER_TYPE_TILL,
+            MpesaConstants::MPESA_IDENTIFIER_TYPE_SHORTCODE,
+        ]);
+
+        $this->validateString( 'short_code', $this->config->getShortCode() );
+        $this->validateString( 'queue_timeout_url', $this->config->getQueueTimeoutURL() );
+        $this->validateString( 'result_url', $this->config->getResultURL() );
+
+        $this->validateString( 'remarks', $remarks );
+
+        $response = self::$http_client->request(
+            uri: $url,
+            method: 'POST',
+            body: [
+                'Initiator' => $this->config->getInitiator(),
+                'SecurityCredential' => $this->config->getSecurityCredential(),
+                'CommandID' => MpesaConstants::MPESA_COMMAND_ID_TRANSACTION_REVERSAL,
+                'PartyA' => $this->config->getShortCode(),
+                'Amount' => $amount,
+                'IdentifierType' => $this->config->getIdentifierType(),
+                'ReceiverParty' => $receiver_party,
+                'RecieverIdentifierType' => $receiver_identifier_type,
+                'Remarks' => $remarks,
+                'QueueTimeOutURL' => $this->config->getQueueTimeoutURL(),
+                'ResultURL' => $this->config->getResultURL(),
+                'Occasion' => $occasion,
+            ],
+            headers: [
+                'Authorization' => sprintf("Bearer %s", $this->config->getAuth()->getToken() )
+            ]
+        );
+
+        return $response;
     }
 
 }

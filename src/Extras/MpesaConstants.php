@@ -52,6 +52,7 @@ class MpesaConstants {
     public const MPESA_COMMAND_ID_PROMOTION_PAYMENT = 'PromotionPayment';
     public const MPESA_COMMAND_ID_ACCOUNT_BALANCE = 'AccountBalance';
     public const MPESA_COMMAND_ID_CUSTOMER_PAYBILL_ONLINE = 'CustomerPayBillOnline';
+    public const MPESA_COMMAND_ID_CUSTOMER_BUY_GOODS_ONLINE = 'CustomerBuyGoodsOnline';
     public const MPESA_COMMAND_ID_TRANSACTION_STATUS_QUERY = 'TransactionStatusQuery';
     public const MPESA_COMMAND_ID_CHECK_IDENTITY = 'CheckIdentity';
     public const MPESA_COMMAND_ID_BUSINESS_PAY_BILL = 'BusinessPayBill';
@@ -59,7 +60,12 @@ class MpesaConstants {
     public const MPESA_COMMAND_ID_DISBURSE_FUNDS_TO_BUSINESS = 'DisburseFundsToBusiness';
     public const MPESA_COMMAND_ID_BUSINESS_TO_BUSINESS_TRANSFER = 'BusinessToBusinessTransfer';
     public const MPESA_COMMAND_ID_TRANSFER_FROM_MMF_TO_UTILITY = 'BusinessTransferFromMMFToUtility';
+    public const MPESA_COMMAND_ID_MERCHANT_TO_MERCHANT_TRANSFER = 'MerchantToMerchantTransfer';
+    public const MPESA_COMMAND_ID_MERCHANT_FROM_MERCHANT_TO_WORKING = 'MerchantTransferFromMerchantToWorking';
+    public const MPESA_COMMAND_ID_MERCHANT_TO_MMF = 'MerchantServicesMMFAccountTransfer';
+    public const MPESA_COMMAND_ID_AGENCY_FLOAT_ADVANCE = 'AgencyFloatAdvance';
 
+    
     // Http codes
     // 2xx series
     public const MPESA_HTTP_OK = 200;
