@@ -347,7 +347,12 @@ The following are the specifications for the error codes
         // error_body: the error body JSON returned
         // status_code: The http error status code for the client e.g. 400, 401, 403 etc
         // exception
-        MpesaClientException(message: string, error_body: string, status_code: int);
+        MpesaClientException(
+            message: string, 
+            error_body: string, 
+            status_code: int, 
+            optional request_parameters: dictionary:(key: string, value: any) = null
+        );
 
         // Gets the https response status code
         public int getStatusCode();
@@ -360,6 +365,9 @@ The following are the specifications for the error codes
         // you may override the default `getMessage()` if you wish
         // examples include, `invalid authentication credentials`
         public String getMessage();
+        
+        // Get the request params e.g. headers, body, method, url
+        public dictionary:(key: string, value: any) getRequestParameters();
 
     }
 
@@ -375,7 +383,12 @@ The following are the specifications for the error codes
         // error_body: the error body JSON returned
         // status_code: The http error status code for the server e.g. 500, 503 etc
         // exception
-        MpesaServerException(message: string, error_body: string, status_code: int);
+        MpesaServerException(
+            message: string, 
+            error_body: string, 
+            status_code: int, 
+            optional request_parameters: dictionary: (key: string, value: any) = null
+        );
 
         // Gets the https response status code
         public int getStatusCode();
@@ -388,6 +401,9 @@ The following are the specifications for the error codes
         // you may override the default `getMessage` if you wish
         // examples include, `service temporarily unavailable`
         public String getMessage();
+
+        // Get the request params e.g. headers, body, method, url
+        public dictionary:(key: str, value: any) getRequestParameters();
 
     }
 
@@ -593,11 +609,22 @@ class MpesaConfig {
     // Returns the mpesa password
     public String getPassWord(timestamp: string);
 
+    // Allows one to override the default security credential
+    // Useful in situations where the security credential is stored in database
+    public MpesaConfig setSecurityCredential(value: string);
+
     // Returns the security credential
     // Base64 encoded string of the M-Pesa short code and password, 
     // which is encrypted using M-Pesa public key and validates the 
     // transaction on M-Pesa Core system.
     public String getSecurityCredential();
+    
+    // This is used to generate the security credential
+    // This is the security credential password
+    public MpesaConfig setInitiatorPassword();
+
+    // Gets the set initiator password
+    public String getInitiatorPassword();
 
     // Provides a way of checking if a configuration is set
     // exists is an alias for isConfigSet
@@ -719,8 +746,8 @@ class MpesaC2B {
         amount: int, 
         to: string, 
         optional account_reference = '': string, 
-        optional timestamp = '': string, 
-        optional description = '': string);
+        optional description = 'Description': string
+        optional timestamp = '': string);
 
     // Query the mpesa client gateway to check for the status of an STK push
     // We generate our timestamp if it is not filled, timestamp must be in the format 'yyyymmddhhiiss'

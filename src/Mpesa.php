@@ -1,15 +1,15 @@
 <?php
 
-namespace HackDelta\Mpesa;
+namespace Hackdelta\Mpesa;
 
-use HackDelta\Mpesa\Extras\MpesaConstants;
-use HackDelta\Mpesa\Extras\Validatable;
-use HackDelta\Mpesa\Main\MpesaB2B;
-use HackDelta\Mpesa\Main\MpesaB2C;
-use HackDelta\Mpesa\Main\MpesaC2B;
-use HackDelta\Mpesa\Main\MpesaConfig;
-use HackDelta\Mpesa\Main\MpesaHttp;
-use HackDelta\Mpesa\Main\MpesaResponse;
+use Hackdelta\Mpesa\Extras\MpesaConstants;
+use Hackdelta\Mpesa\Extras\Validatable;
+use Hackdelta\Mpesa\Main\MpesaB2B;
+use Hackdelta\Mpesa\Main\MpesaB2C;
+use Hackdelta\Mpesa\Main\MpesaC2B;
+use Hackdelta\Mpesa\Main\MpesaConfig;
+use Hackdelta\Mpesa\Main\MpesaHttp;
+use Hackdelta\Mpesa\Main\MpesaResponse;
 
 /**
  * The main class that will be instantiated
@@ -53,21 +53,21 @@ class Mpesa
     public function C2B(): MpesaC2B
     {
         return self::$C2B === null ?
-            new MpesaC2B($this->config) :
+            self::$C2B = new MpesaC2B($this->config) :
             self::$C2B;
     }
 
     public function B2B(): MpesaB2B
     {
         return self::$B2B === null ?
-            new MpesaB2B($this->config) :
+            self::$B2B = new MpesaB2B($this->config) :
             self::$B2B;
     }
 
     public function B2C(): MpesaB2C
     {
         return self::$B2C === null ?
-            new MpesaB2C($this->config) :
+            self::$B2C = new MpesaB2C($this->config) :
             self::$B2C;
     }
 

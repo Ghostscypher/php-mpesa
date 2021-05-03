@@ -1,9 +1,9 @@
 <?php
 
-namespace HackDelta\Mpesa\Main;
+namespace Hackdelta\Mpesa\Main;
 
-use HackDelta\Mpesa\Extras\MpesaConstants;
-use HackDelta\Mpesa\Extras\Validatable;
+use Hackdelta\Mpesa\Extras\MpesaConstants;
+use Hackdelta\Mpesa\Extras\Validatable;
 
 /**
  * Contains tasks that can be done for a C2B transaction 
@@ -39,7 +39,7 @@ class MpesaC2B
     public function register(): MpesaResponse
     {
         $url = sprintf(
-            "%s/%s", 
+            "%s%s", 
             $this->config->getBaseURL(), 
             MpesaConstants::MPESA_URIS['register_c2b']
         );
@@ -69,7 +69,7 @@ class MpesaC2B
     public function simulate(string $MSISDN, int $amount, $account_reference = ''): MpesaResponse
     {
         $url = sprintf(
-            "%s/%s", 
+            "%s%s", 
             $this->config->getBaseURL(), 
             MpesaConstants::MPESA_URIS['simulate_c2b']
         );
@@ -83,7 +83,7 @@ class MpesaC2B
             'ShortCode' => $this->config->getShortCode(),
             'CommandID' => $this->config->getIdentifierType() === MpesaConstants::MPESA_IDENTIFIER_TYPE_TILL ? 
                             MpesaConstants::MPESA_COMMAND_ID_CUSTOMER_BUY_GOODS_ONLINE : MpesaConstants::MPESA_COMMAND_ID_CUSTOMER_PAYBILL_ONLINE,
-            'Amount' => $amount,
+            'Amount' => "{$amount}",
             'Msisdn' => $MSISDN
         ];
 
@@ -107,13 +107,13 @@ class MpesaC2B
     public function initiateSTKPush(
         int $amount, 
         string $to, 
-        string $account_reference = '', 
-        string $timestamp = '', 
-        string $description = ''
+        string $account_reference = '',
+        string $description = 'Description',
+        string $timestamp = ''
     ): MpesaResponse 
     {
         $url = sprintf(
-            "%s/%s", 
+            "%s%s", 
             $this->config->getBaseURL(), 
             MpesaConstants::MPESA_URIS['stk_push']
         );
@@ -139,7 +139,7 @@ class MpesaC2B
             body: [
                 'BusinessShortCode' => $this->config->getBusinessShortCode(),
                 'Password' => $this->config->getPassword($my_timestamp),
-                'Timestamp' => $timestamp,
+                'Timestamp' => $my_timestamp,
                 'TransactionType' => MpesaConstants::MPESA_COMMAND_ID_CUSTOMER_PAYBILL_ONLINE,
                 'Amount' => $amount,
                 'PartyA' => $to,
@@ -161,7 +161,7 @@ class MpesaC2B
     public function STKPushQuery(string $checkout_request_id, string $timestamp = ''): MpesaResponse
     {
         $url = sprintf(
-            "%s/%s", 
+            "%s%s", 
             $this->config->getBaseURL(), 
             MpesaConstants::MPESA_URIS['stk_push_query']
         );
@@ -182,7 +182,7 @@ class MpesaC2B
             method: 'POST',
             body: [
                 'BusinessShortCode' => $this->config->getBusinessShortCode(),
-                'Password' => $this->config->getPassword($timestamp),
+                'Password' => $this->config->getPassword($my_timestamp),
                 'Timestamp' => $my_timestamp,
                 'CheckoutRequestID' => $checkout_request_id,
             ],

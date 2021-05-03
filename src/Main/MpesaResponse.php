@@ -1,6 +1,6 @@
 <?php
 
-namespace HackDelta\Mpesa\Main;
+namespace Hackdelta\Mpesa\Main;
 
 /**
  * This class is specialized to Mpesa objects only
@@ -38,5 +38,11 @@ class MpesaResponse
     {
         return $this->status_code;
     }
+
+    public function __toString()
+    {
+        return $this->getJSONString();
+    }
+
 
 }

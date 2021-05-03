@@ -1,9 +1,9 @@
 <?php
 
-namespace HackDelta\Mpesa\Main;
+namespace Hackdelta\Mpesa\Main;
 
-use HackDelta\Mpesa\Exceptions\MpesaInternalException;
-use HackDelta\Mpesa\Extras\MpesaConstants;
+use Hackdelta\Mpesa\Exceptions\MpesaInternalException;
+use Hackdelta\Mpesa\Extras\MpesaConstants;
 
 /**
  * Contains methods that are used to store environment
@@ -24,6 +24,7 @@ class MpesaConfig
 
         // User credential
         'initiator_name' => '',
+        'initiator_password' => '',
         'passkey' => '',
 
         // Short code
@@ -128,14 +129,14 @@ class MpesaConfig
         foreach ($this->config as $key => $value) {
 
             if( isset($config[$key]) ) { 
-
-                if(gettype($config[$value]) !== 'string'){
+                
+                if(gettype($config[$key]) !== 'string'){
                     throw new MpesaInternalException(
                         "Value of {$key} - '${value}' in your config must be a string"
                     );
                 }
 
-                $this->config[$key] = trim($config[$value]);
+                $this->config[$key] = trim($config[$key]);
             }
 
         }
@@ -185,7 +186,7 @@ class MpesaConfig
      */
     public function isSandboxEnvironment(): bool 
     {
-        return $this->config['environment'] === 'sandbox';   
+        return !$this->isProductionEnvironment();   
     }
 
     /**
@@ -193,7 +194,7 @@ class MpesaConfig
      */
     public function isProductionEnvironment(): bool 
     {
-        return !$this->isSandboxEnvironment();
+        return strtolower($this->config['environment']) === 'production';
     }
 
     /**
@@ -251,7 +252,9 @@ class MpesaConfig
      */
     public function getCredentials(): string
     {
-        return base64_encode("{$this->consumer_key}:{$this->consumer_secret}");
+        return base64_encode(
+            sprintf("%s:%s", $this->getConsumerKey(), $this->getConsumerSecret())
+        );
     }
 
     /**
@@ -274,16 +277,18 @@ class MpesaConfig
      */
     public function getAuth(): MpesaAuth
     {
-        if ($this->has_api_credentials_changed 
-            || $this->auth !== null
-            || ! $this->auth->hasExpired() 
+        if (! $this->has_api_credentials_changed 
+            && $this->auth !== null 
+            && ! $this->auth->hasExpired()
         ) {
             return $this->auth;
         }
 
         $this->has_api_credentials_changed = false;
 
-        return new MpesaAuth($this);
+        $this->auth = new MpesaAuth($this);
+
+        return $this->auth;
     }
 
     /**
@@ -292,11 +297,11 @@ class MpesaConfig
      * @param string $value The shortcode
      * @param string $identifier_type Indicates the kind of short code the above is
      *      Accepted values are:
-     *         HackDelta\Mpesa\Extras\MpesaConstants\MpesaConstants::MPESA_IDENTIFIER_TYPE_PAYBILL,
-     *         HackDelta\Mpesa\Extras\MpesaConstants\MpesaConstants::MPESA_IDENTIFIER_TYPE_TILL
+     *         Hackdelta\Mpesa\Extras\MpesaConstants\MpesaConstants::MPESA_IDENTIFIER_TYPE_PAYBILL,
+     *         Hackdelta\Mpesa\Extras\MpesaConstants\MpesaConstants::MPESA_IDENTIFIER_TYPE_TILL
      * 
-     * @var HackDelta\Mpesa\Extras\MpesaConstants\MpesaConstants::MPESA_IDENTIFIER_TYPE_PAYBILL
-     * @var HackDelta\Mpesa\Extras\MpesaConstants\MpesaConstants::MPESA_IDENTIFIER_TYPE_TILL
+     * @var Hackdelta\Mpesa\Extras\MpesaConstants\MpesaConstants::MPESA_IDENTIFIER_TYPE_PAYBILL
+     * @var Hackdelta\Mpesa\Extras\MpesaConstants\MpesaConstants::MPESA_IDENTIFIER_TYPE_TILL
      * 
      * @throws MpesaInternalException when an invalid identifier type is set
      */
@@ -367,7 +372,7 @@ class MpesaConfig
      */
     public function getBusinessShortCode(): string
     {
-        if( !$this->isConfigSet('business_short_code') ) {
+        if($this->config['business_short_code'] === '') {
             return $this->config['short_code'];
         }
 
@@ -604,7 +609,41 @@ class MpesaConfig
     }
 
     /**
+     * Sets the initiator password
+     */
+    public function setInitiatorPassword(string $initiator_password): self
+    {
+        $this->config['initiator_password'] = $initiator_password;
+        
+        $this->has_user_credentials_changed = true;
+
+        return $this;
+    }
+
+    /**
+     * @return the initiator password
+     */
+    public function getInitiatorPassword(): string
+    {
+        return $this->config['initiator_password'];
+    }
+
+    /**
+    * Allows one to override the default security credential,
+    * useful in situation where this credential is stored in database
+    */
+    public function setSecurityCredential(string $value): self
+    {
+        $this->security_credential = $value;
+        $this->has_user_credentials_changed = false;
+
+        return $this;
+    }
+
+    /**
      * The encrypted security
+     * 
+     * Thanks to https://github.com/peternjeru/mpesa-encryption-encoding-php/blob/master/src/InitiatorPasswordEncryption.php
      */
     public function getSecurityCredential(): string
     {
@@ -615,28 +654,74 @@ class MpesaConfig
         // Get the path to correct cert
         $cert_path =  realpath(
             sprintf(
-                "%s/../../../certificates/%s",
+                "%s/../../certificates/%s",
                 __DIR__,
                 $this->isSandboxEnvironment() ? 'sandbox.cer' : 'production.cer'
             )
         );
 
         $encrypted = '';
+        
+        // Get the contents of the 
+        $cert_content = file_get_contents($cert_path);
+
+        $cert_content = "-----BEGIN CERTIFICATE-----\n".
+            "MIIGgDCCBWigAwIBAgIKMvrulAAAAARG5DANBgkqhkiG9w0BAQsFADBbMRMwEQYK".
+            "CZImiZPyLGQBGRYDbmV0MRkwFwYKCZImiZPyLGQBGRYJc2FmYXJpY29tMSkwJwYD".
+            "VQQDEyBTYWZhcmljb20gSW50ZXJuYWwgSXNzdWluZyBDQSAwMjAeFw0xNDExMTIw".
+            "NzEyNDVaFw0xNjExMTEwNzEyNDVaMHsxCzAJBgNVBAYTAktFMRAwDgYDVQQIEwdO".
+            "YWlyb2JpMRAwDgYDVQQHEwdOYWlyb2JpMRAwDgYDVQQKEwdOYWlyb2JpMRMwEQYD".
+            "VQQLEwpUZWNobm9sb2d5MSEwHwYDVQQDExhhcGljcnlwdC5zYWZhcmljb20uY28u".
+            "a2UwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCotwV1VxXsd0Q6i2w0".
+            "ugw+EPvgJfV6PNyB826Ik3L2lPJLFuzNEEJbGaiTdSe6Xitf/PJUP/q8Nv2dupHL".
+            "BkiBHjpQ6f61He8Zdc9fqKDGBLoNhNpBXxbznzI4Yu6hjBGLnF5Al9zMAxTij6wL".
+            "GUFswKpizifNbzV+LyIXY4RR2t8lxtqaFKeSx2B8P+eiZbL0wRIDPVC5+s4GdpFf".
+            "Y3QIqyLxI2bOyCGl8/XlUuIhVXxhc8Uq132xjfsWljbw4oaMobnB2KN79vMUvyoR".
+            "w8OGpga5VoaSFfVuQjSIf5RwW1hitm/8XJvmNEdeY0uKriYwbR8wfwQ3E0AIW1Fl".
+            "MMghAgMBAAGjggMkMIIDIDAdBgNVHQ4EFgQUwUfE+NgGndWDN3DyVp+CAiF1Zkgw".
+            "HwYDVR0jBBgwFoAU6zLUT35gmjqYIGO6DV6+6HlO1SQwggE7BgNVHR8EggEyMIIB".
+            "LjCCASqgggEmoIIBIoaB1mxkYXA6Ly8vQ049U2FmYXJpY29tJTIwSW50ZXJuYWwl".
+            "MjBJc3N1aW5nJTIwQ0ElMjAwMixDTj1TVkRUM0lTU0NBMDEsQ049Q0RQLENOPVB1".
+            "YmxpYyUyMEtleSUyMFNlcnZpY2VzLENOPVNlcnZpY2VzLENOPUNvbmZpZ3VyYXRp".
+            "b24sREM9c2FmYXJpY29tLERDPW5ldD9jZXJ0aWZpY2F0ZVJldm9jYXRpb25MaXN0".
+            "P2Jhc2U/b2JqZWN0Q2xhc3M9Y1JMRGlzdHJpYnV0aW9uUG9pbnSGR2h0dHA6Ly9j".
+            "cmwuc2FmYXJpY29tLmNvLmtlL1NhZmFyaWNvbSUyMEludGVybmFsJTIwSXNzdWlu".
+            "ZyUyMENBJTIwMDIuY3JsMIIBCQYIKwYBBQUHAQEEgfwwgfkwgckGCCsGAQUFBzAC".
+            "hoG8bGRhcDovLy9DTj1TYWZhcmljb20lMjBJbnRlcm5hbCUyMElzc3VpbmclMjBD".
+            "QSUyMDAyLENOPUFJQSxDTj1QdWJsaWMlMjBLZXklMjBTZXJ2aWNlcyxDTj1TZXJ2".
+            "aWNlcyxDTj1Db25maWd1cmF0aW9uLERDPXNhZmFyaWNvbSxEQz1uZXQ/Y0FDZXJ0".
+            "aWZpY2F0ZT9iYXNlP29iamVjdENsYXNzPWNlcnRpZmljYXRpb25BdXRob3JpdHkw".
+            "KwYIKwYBBQUHMAGGH2h0dHA6Ly9jcmwuc2FmYXJpY29tLmNvLmtlL29jc3AwCwYD".
+            "VR0PBAQDAgWgMD0GCSsGAQQBgjcVBwQwMC4GJisGAQQBgjcVCIfPjFaEwsQDhemF".
+            "NoTe0Q2GoIgIZ4bBx2yDublrAgFkAgEMMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggr".
+            "BgEFBQcDATAnBgkrBgEEAYI3FQoEGjAYMAoGCCsGAQUFBwMCMAoGCCsGAQUFBwMB".
+            "MA0GCSqGSIb3DQEBCwUAA4IBAQBMFKlncYDI06ziR0Z0/reptIJRCMo+rqo/cUuP".
+            "KMmJCY3sXxFHs5ilNXo8YavgRLpxJxdZMkiUIVuVaBanXkz9/nMriiJJwwcMPjUV".
+            "9nQqwNUEqrSx29L1ARFdUy7LhN4NV7mEMde3MQybCQgBjjOPcVSVZXnaZIggDYIU".
+            "w4THLy9rDmUIasC8GDdRcVM8xDOVQD/Pt5qlx/LSbTNe2fekhTLFIGYXJVz2rcsj".
+            "k1BfG7P3pXnsPAzu199UZnqhEF+y/0/nNpf3ftHZjfX6Ws+dQuLoDN6pIl8qmok9".
+            "9E/EAgL1zOIzFvCRYlnjKdnsuqL1sIYFBlv3oxo6W1O+X9IZ\n".
+            "-----END CERTIFICATE-----";
+
+        // Create the public key
+        $public_key = openssl_pkey_get_public($cert_content);
 
         if (! openssl_public_encrypt(
-            $this->getPasskey(), 
+            $this->getInitiatorPassword(), 
             $encrypted, 
-            $cert_path, 
+            $public_key, 
             OPENSSL_PKCS1_PADDING)
         ) {
+            var_dump($encrypted);
             throw new MpesaInternalException(
                 "Unable to generate security credential. Perhaps it is bigger than the key size?"
             );
         }
 
         $this->has_user_credentials_changed = false;
+        $this->security_credential = base64_encode($encrypted);
 
-        return base64_encode($encrypted);
+        return $this->security_credential;
     }
 
     /**

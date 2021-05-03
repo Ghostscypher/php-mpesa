@@ -1,9 +1,9 @@
 <?php
 
-namespace HackDelta\Mpesa\Main;
+namespace Hackdelta\Mpesa\Main;
 
-use HackDelta\Mpesa\Extras\MpesaConstants;
-use HackDelta\Mpesa\Extras\Validatable;
+use Hackdelta\Mpesa\Extras\MpesaConstants;
+use Hackdelta\Mpesa\Extras\Validatable;
 
 /**
  * Contains tasks that can be done for a B2C transaction 

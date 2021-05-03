@@ -1,6 +1,6 @@
 <?php
 
-namespace HackDelta\Mpesa\Extras;
+namespace Hackdelta\Mpesa\Extras;
 
 /**
  * This class stores constants that will be used throughout the mpesa app

@@ -1,6 +1,6 @@
 <?php
 
-namespace HackDelta\Mpesa\Exceptions;
+namespace Hackdelta\Mpesa\Exceptions;
 
 use Exception;
 

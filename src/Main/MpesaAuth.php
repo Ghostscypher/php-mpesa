@@ -1,10 +1,9 @@
 <?php
 
-namespace HackDelta\Mpesa\Main;
+namespace Hackdelta\Mpesa\Main;
 
-use HackDelta\Mpesa\Exceptions\MpesaInternalException;
-use HackDelta\Mpesa\Extras\MpesaConstants;
-use HackDelta\Mpesa\Extras\Validatable;
+use Hackdelta\Mpesa\Extras\MpesaConstants;
+use Hackdelta\Mpesa\Extras\Validatable;
 
 /**
  * This class will contain methods for generating authentication tokens, and managing the
@@ -26,9 +25,9 @@ class MpesaAuth
         $this->validateString( 'Consumer key', $config->getConsumerKey() );
         $this->validateString( 'Consumer secret', $config->getConsumerSecret() );
 
-        if( self::$http_client === null ) { self::$http_client = new MpesaHttp($this->config); }
-
         $this->config = $config;
+
+        if( self::$http_client === null ) { self::$http_client = new MpesaHttp($this->config); }
     }
 
     public function setAuthToken(string $token, int $expires_at_timestamp): self
@@ -57,7 +56,7 @@ class MpesaAuth
     private function refreshToken(): void 
     {
         $auth_url = sprintf(
-            "%s/%s", 
+            "%s%s", 
             $this->config->getBaseURL(), 
             MpesaConstants::MPESA_URIS['generate_token']
         );
@@ -78,12 +77,11 @@ class MpesaAuth
         if($this->expires_at !== 0) { $this->has_token_changed = true; }
 
         // Decode the JSON data returned
-        $json_data = json_decode( $response->getJSONString() );
-
+        $json_data = json_decode( $response->getJSONString(), true);
+        
         // Set the tokens
-        $this->token - $json_data['token'];
-        $this->expires_at = time() + (int)$json_data['expires'];
-
+        $this->token = $json_data['access_token'];
+        $this->expires_at = time() + (int)$json_data['expires_in'];
     }
 
     public function getAuthToken(bool $force = false): self

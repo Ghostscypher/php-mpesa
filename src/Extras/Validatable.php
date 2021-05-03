@@ -1,8 +1,8 @@
 <?php
 
-namespace HackDelta\Mpesa\Extras;
+namespace Hackdelta\Mpesa\Extras;
 
-use HackDelta\Mpesa\Exceptions\MpesaInternalException;
+use Hackdelta\Mpesa\Exceptions\MpesaInternalException;
 
 /**
  * Contains utility function for performing validation to make sure
