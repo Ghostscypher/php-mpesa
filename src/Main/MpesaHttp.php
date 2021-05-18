@@ -72,6 +72,8 @@ class MpesaHttp
             'headers' => [
                 'Cache-Control' => 'no-cache',
                 'Accept' => 'application/json',
+                'Accept-Encoding' => 'application/json',
+                'Content-Type' => 'application/json',
             ]
         ];
         

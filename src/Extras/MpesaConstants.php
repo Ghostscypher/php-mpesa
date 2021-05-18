@@ -37,6 +37,10 @@ class MpesaConstants {
         'stk_push' => '/mpesa/stkpush/v1/processrequest',
         'stk_push_query' => '/mpesa/stkpushquery/v1/query',
 
+        // Pull transactions API
+        'pull_transaction_register' => '/pulltransactions/v1/register',
+        'pull_transaction_query' => '/pulltransactions/v1/query',
+
     ];
 
     // Identifier types
@@ -124,5 +128,8 @@ class MpesaConstants {
     public const MPESA_CLIENT_TO_GATEWAY_SUCCESS_C2B = '0';
     public const MPESA_CLIENT_TO_GATEWAY_SUCCESS_OTHERS = '00000000';
     public const MPESA_CLIENT_TO_GATEWAY_REJECT = '1';
+
+    // MPesa request PULL request
+    public const MPESA_REQUEST_TYPE_PULL = 'Pull';
 
 }

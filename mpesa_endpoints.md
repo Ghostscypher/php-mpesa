@@ -27,6 +27,10 @@ The following specifies the mpesa endpoints, their data and their expected respo
     - [_Request format_](#request-format-8)
   - [Initiate stk push query](#initiate-stk-push-query)
     - [_Request format_](#request-format-9)
+  - [Register pull transaction API URL](#register-pull-transaction-api-url)
+    - [_Request format_](#request-format-10)
+  - [Pull transaction API](#pull-transaction-api)
+    - [_Request format_](#request-format-11)
   - [Errors, and error code](#errors-and-error-code)
   - [Identifier Types](#identifier-types)
   - [M-Pesa Result and Response Codes (From gateway to client)](#m-pesa-result-and-response-codes-from-gateway-to-client)
@@ -733,6 +737,1123 @@ Response:
     "CheckoutRequestID":"ws_CO_27072017151044001",
     "ResultCode":"1032",
     "ResultDesc":"[STK_CB - ]Request cancelled by user"
+}
+```
+
+## Register pull transaction API URL
+
+The original documentation can be found [here](https://documenter.getpostman.com/view/1724456/SVtTy8sd#a4230cb9-1a34-4300-949b-43cfe0844968)
+This is a relatively new API, and will need a bit of introduction
+The Pull Transactions API is a reconciliation API that allows a partner to query all transactions performed under their shortcode for C2B.
+Pull API stores all C2B transactions done under a shortcode and are available for 48hrs. In the event that two transactions failed to reach the C2B callback URLs registered, e.g. between 1400-1415hrs, a partner can query all transactions done during that period on the shortcode. The result will have all transactions including those that were successfully sent to the C2B callback URLs and those that failed to reach the callback URLs for the period specified (1400-1415hrs)
+
+To make use of pull, a user will need to register their urls and shortcode. The shortcode used must be for a user who has gone live and is on production
+
+NB: Register URL API is only called once to enable pull transactions.
+
+Below are the steps taken to make a register url call
+
+Method: `POST`
+
+Endpoint: `{base_uri}/pulltransactions/v1/register`
+
+### _Request format_
+
+headers:
+
+`Authorization: Bearer {access_token}` - Required
+
+`Accept: application/json` - Required
+
+`Content-Type: application/json` - Required
+
+`Accept-Encoding: application/json` - optional
+
+`cache-control: no-cache` - optional
+
+Body:
+
+```json
+{
+  "ShortCode":"600000", // Organization ShortCode that was used during Go-Live process.
+  "RequestType":"Pull", // Defines the type of operation, default value is Pull
+  "NominatedNumber":"0722000000", // This is Safaricom MSISDN associated with the organization account using Pull API(07XXXXXXXX or 2547XXXXXXX).
+  "CallBackURL": "https://domain/path" // A CallBack URL is a valid secure URL that is used to receive notifications.
+}
+```
+
+Response:
+
+Sample Response Codes:
+
+1000: Short code Registered Successfully
+
+1001: ShortCode already Registered
+
+```json
+{
+  "ResponseRefID": "18633-7271215-1",
+  "Response Status": "1001",
+  "ShortCode": "600000",
+  "Response Description": "ShortCode already Registered"
+}
+```
+
+## Pull transaction API
+
+To make a pull of the missed transactions. Populate the request body with the following parameters.
+
+NB: This API pulls transactions for a period not exceeding 48hrs.
+
+Method: `POST`
+
+Endpoint: `{base_uri}/pulltransactions/v1/query`
+
+### _Request format_
+
+headers:
+
+`Authorization: Bearer {access_token}` - Required
+
+`Accept: application/json` - Required
+
+`Content-Type: application/json` - Required
+
+`Accept-Encoding: application/json` - optional
+
+`cache-control: no-cache` - optional
+
+Body:
+
+```json
+{
+  "ShortCode":"600000", // This is your paybill number/till number, which you expect to receive payments notifications about.
+  "StartDate":"2020-08-04 8:36:00", // The start period of the missing transactions in the format of 2019-07-31 20:35:21 / 2019-07-31 19:00
+  "EndDate":"2020-08-16 10:10:000", // The end of the period for the missing transactions in the format of 2019-07-31 20:35:21 / 2019-07-31 22:35
+  "OffSetValue":"0" // Starts from 0. The service uses offset as opposed to page numbers. The OFF SET value allows you to specify which row to start from retrieving data. 
+  // Suppose you wanted to show results 101-200. With the OFFSET keyword you type the (page number/index/offset value) 100.
+}
+```
+
+Response:
+
+Sample Response Codes:
+
+1000: Success, transactions fetched successfully
+
+1001: Null, No transactions available for the selected time period.The response body is "Transaction": "[[]]"
+
+500: Failed to retrieve transactions. The short code does not have any available transactions
+
+```json
+{
+  "ResponseRefID": "26178-42530161-2",
+  "ResponseCode": "1000",
+  "ResponseMessage": "Success",
+  "Response": [
+    [
+      {
+        "transactionId": "yzlyrEsRG1",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "168.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "ZobjR29vdz",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "647.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "nZ84WxLx8p",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "876.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "9MFsu3cihH",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "687.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "lcCmdkgssV",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "588.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "1OozszLlTL",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "666.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "IkOgUVYnX2",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "846.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "mYpDa4ullG",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "861.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "OxlseDz4Nw",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "224.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "pbuOnCmioO",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "545.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "grF2CDGhJG",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "932.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "Tzu1n4Glo8",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "867.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "yPKYKCtsKr",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "796.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "YFOtc46jKg",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "554.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "7eHMdZ8WmD",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "372.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "6Jif5zJLce",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "259.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "EqHudIBt61",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "580.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "fOv5PgxMJn",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "410.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "hESVxogqPg",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "562.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "6lPD7rSV6K",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "499.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "79mjeVyf5h",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "422.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "bysbRY8KG2",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "710.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "u5HDaFbZqP",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "862.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "nukCfMTnTp",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "763.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "6b7mJGgf2z",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "708.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "5VuuYoezqx",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "945.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "puKp4P22xG",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "111.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "Sw15w3401n",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "140.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "xmVscNqtkt",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "814.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "8BWt0k6vJz",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "251.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "dc1SW8QZPD",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "523.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "TJsFjZ6BCV",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "893.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "kEb5ijl8aQ",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "871.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "1n75IV524Y",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "128.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "jqLDlBt1ua",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "86.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "CgHQSGzE1l",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "854.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "vqurRmsBko",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "915.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "FSfPaLL5KW",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "532.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "TqkAGgk1hZ",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "587.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "nPo6qTUVo3",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "82.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "SlJ3CUOG9N",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "360.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "2svq4ZMdU7",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "580.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "7RKL8T2fP9",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "683.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "VLQ5LMFmkn",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "671.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "5tgM7bs3Io",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "135.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "YlF1jAsDzh",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "570.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "4pkpy5dJnH",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "185.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "rJtZkavplb",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "312.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "pbjocZRVwC",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "301.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "mCBtjYxeZm",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "459.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "fbUX2Sjit3",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "115.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "9iUJJfq1H8",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "478.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "P81iByzdb0",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "269.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "0wHLF7kjS4",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "514.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "wNXUXYwCMs",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "295.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "zmm4NgIqnI",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "637.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "RXnuFJavEu",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "478.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "fRPYBdV87i",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "357.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "PUH0yK7S4h",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "137.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "xBns4pgXY1",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "726.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "mtuPk27UGl",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "578.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "ejLZbK94r7",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "339.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "EgIJOq8yax",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "96.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "8wJaEj7P7O",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "254.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "hQ7ZJsohqV",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "88.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "zbLKVUuNGN",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "618.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "Fux1ixyvJf",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "897.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "XShdvwvKRX",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "654.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "dF4c0u6upT",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "855.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "mYJtRBugbh",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "789.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "eD2sYlgHeA",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "874.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "OwT3Ppa5Sp",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "543.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "BQU0yJwcgr",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "838.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "Pz4NYMCG3u",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "162.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "CYgISNszfx",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "41.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "5a4f0euu2d",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "275.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "1gomkM7nY2",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "421.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "hoFtm9434V",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "214.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "mOxDPMRoNp",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "347.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "m2Nr80s3Uu",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "869.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "HIrlK81GTF",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "624.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "vvpVodUcSq",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "348.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "5ULgMAjMxx",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "892.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "sHfQWabRRo",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "816.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "YdsNKK61r6",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "55.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "7SQm5hrAFf",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "896.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "ibOWje82yV",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "367.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "ixU48OEU3G",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "416.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "5kkQSwebbM",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "605.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "36TdUOZFNG",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "646.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "T5rzltf6cL",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "341.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "Q2y9EHPiXL",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "888.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "D2hCHWlGGw",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "895.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "CMZFeGyEl6",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "790.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "6zMhR4Ypzc",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "301.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "Ntl1pP2iRV",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "941.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "rjF9n3rzmh",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "67.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "ysPnSyMbRx",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "528.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "BTGnRE2mZh",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "248.00",
+        "organizationname": "Daraja Pull API Test"
+      },
+      {
+        "transactionId": "LjFzAtI088",
+        "trxDate": "2020-08-05T10:13:00Z",
+        "msisdn": 72200000,
+        "sender": "UAT2",
+        "transactiontype": "c2b-pay-bill-debit",
+        "billreference": "37207636392",
+        "amount": "93.00",
+        "organizationname": "Daraja Pull API Test"
+      }
+    ]
+  ]
 }
 ```
 

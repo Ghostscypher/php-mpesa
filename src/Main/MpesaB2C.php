@@ -70,11 +70,12 @@ class MpesaB2C
         $this->validateString( 'remarks', $remarks );
 
         $temp = [
-            'Initiator' => $this->config->getInitiator(),
+            'InitiatorName' => $this->config->getInitiator(),
             'SecurityCredential' => $this->config->getSecurityCredential(),
             'CommandID' => $command_id,
             'PartyA' => $this->config->getShortCode(),
             'PartyB' => $to,
+            'Amount' => $amount,
             'Remarks' => $remarks,
             'QueueTimeOutURL' => $this->config->getQueueTimeoutURL(),
             'ResultURL' => $this->config->getResultURL(),
@@ -82,10 +83,10 @@ class MpesaB2C
         ];
 
         $response = self::$http_client->request(
-            uri: $url,
-            method: 'POST',
-            body: $temp,
-            headers: [
+            $url,
+            'POST',
+            $temp,
+            [
                 'Authorization' => sprintf("Bearer %s", $this->config->getAuth()->getToken() )
             ]
         );

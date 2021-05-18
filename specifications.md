@@ -133,6 +133,11 @@ You can copy the configs below and make them language specific.
             // Stk related
             'stk_push' -> '/mpesa/stkpush/v1/processrequest',
             'stk_push_query' -> '/mpesa/stkpushquery/v1/query',
+
+            // Pull transactions API
+            'pull_transaction_register' -> '/pulltransactions/v1/register',
+            'pull_transaction_query' -> '/pulltransactions/v1/query',
+
         ];
 
         // Identifier types
@@ -220,6 +225,9 @@ You can copy the configs below and make them language specific.
         const MPESA_CLIENT_TO_GATEWAY_SUCCESS_C2B = '0';
         const MPESA_CLIENT_TO_GATEWAY_SUCCESS_OTHERS = '00000000';
         const MPESA_CLIENT_TO_GATEWAY_REJECT = '1';
+
+        // MPesa request PULL request
+        const MPESA_REQUEST_TYPE_PULL = 'Pull';
 
     }
 ```
@@ -580,7 +588,20 @@ class MpesaConfig {
     public MpesaConfig setSTKCallbackURL(value: string);
 
     // Return the STK callback
-    public String getSTKCallbackURL();   
+    public String getSTKCallbackURL();  
+
+    // Set the pull request callback URL
+    public MpesaConfig setPullCallbackURL(value: string);
+
+    // Get the pull request callback URL
+    public String getPullCallbackURL();
+
+    // Set the organization MSISDN, required for pull requests
+    // This is the number that receives the confirmation message
+    public MpesaConfig setOrganizationMSISDN(value: string);
+
+    // Get the organization MSISDN for the pull request
+    public String getOrganizationMSISDN();
 
     // Helper method to get the UTL via url name
     // see example usage below
@@ -619,6 +640,16 @@ class MpesaConfig {
     // transaction on M-Pesa Core system.
     public String getSecurityCredential();
     
+    // If the user has their own certificate this method allows them to set the path
+    // of the certificates, if none of this is supplied we will use our own
+    // certificates found in the certificates folder
+    public MpesaConfig setSandboxCertificatePath();
+    public MpesaConfig setProductionCertificatePath();
+
+    // Allow the user to get the paths
+    public string getSandboxCertificatePath();
+    public string getProductionCertificatePath();
+
     // This is used to generate the security credential
     // This is the security credential password
     public MpesaConfig setInitiatorPassword();
@@ -665,8 +696,8 @@ class MpesaHttp
     // headers: this refers to extra headers that will be sent with the current request
     //         'accept: application/json' and 'cache-control: no-cache' is included by default
     public MpesaResponse request(
-        method: string,
         url: string,
+        method: string,
         optional body: dictionary(key: string, value: string) = null,
         optional headers: dictionary(key: string, value: string) = null, 
         optional options: dictionary(key: string, value: string) = null
@@ -713,6 +744,7 @@ This class will contain logic for handling all the client to business requests/l
 2. Simulate transaction - Only available in sandbox environment
 3. Initiate an STK push request
 4. Check the status of the STK push i.e. STK push query
+5. Register pull transaction URL
 
 ``` java
 class MpesaC2B {
@@ -729,7 +761,7 @@ class MpesaC2B {
 
     // Performs the register
     // All data is in config
-    public MpesaResponse register();
+    public MpesaResponse registerURL();
 
     // Simulate a transaction, this is only available in sandbox 
     // amount is an unsigned int always check for negative or 0
@@ -743,8 +775,8 @@ class MpesaC2B {
     // account_reference: 
     // timestamp: must be in the format 'yyyymmddhhiiss'
     public MpesaResponse initiateSTKPush(
-        amount: int, 
         to: string, 
+        amount: int, 
         optional account_reference = '': string, 
         optional description = 'Description': string
         optional timestamp = '': string);
@@ -755,6 +787,20 @@ class MpesaC2B {
         checkout_request_id: string, 
         optional timestamp = '': string
     );
+
+    // Register pull request endpoint
+    public MpesaResponse pullRequestRegisterURL(); 
+
+    // Perform a pull request query
+    // start_date: The start period of the missing transactions in the 
+    //      format of 2019-07-31 20:35:21 or 2019-07-31 19:00
+    // end_date: The end of the period for the missing transactions in the 
+    //          format of 2019-07-31 20:35:21 or 2019-07-31 22:35
+    // offset: Starts from 0. The service uses offset as opposed to page numbers. 
+    //      The OFF SET value allows you to specify which row to start from retrieving 
+    //      data. Suppose you wanted to show results 101-200. With the 
+    //      OFFSET keyword you type the (page number/index/offset value) 100.
+    public MpesaResponse pullRequestQuery(start_date: string, end_date: string, offset: int = 0); 
 
 }
 

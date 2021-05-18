@@ -62,9 +62,9 @@ class MpesaAuth
         );
 
         $response = self::$http_client->request(
-            method: 'GET',
-            uri: $auth_url,
-            headers: [
+            'GET',
+            $auth_url,
+            [
                 'Authorization' => sprintf(
                     'Basic %s', 
                     $this->config->getCredentials() 

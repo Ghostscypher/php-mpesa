@@ -91,9 +91,9 @@ class Mpesa
         $this->validateString( 'remarks', $remarks );
 
         $response = self::$http_client->request(
-            uri: $url,
-            method: 'POST',
-            body: [
+            $url,
+            'POST',
+            [
                 'Initiator' => $this->config->getInitiator(),
                 'SecurityCredential' => $this->config->getSecurityCredential(),
                 'CommandID' => MpesaConstants::MPESA_COMMAND_ID_ACCOUNT_BALANCE,
@@ -103,7 +103,7 @@ class Mpesa
                 'QueueTimeOutURL' => $this->config->getQueueTimeoutURL(),
                 'ResultURL' => $this->config->getResultURL(),
             ],
-            headers: [
+            [
                 'Authorization' => sprintf("Bearer %s", $this->config->getAuth()->getToken() )
             ]
         );
@@ -139,9 +139,9 @@ class Mpesa
         $this->validateString( 'remarks', $remarks );
 
         $response = self::$http_client->request(
-            uri: $url,
-            method: 'POST',
-            body: [
+            $url,
+            'POST',
+            [
                 'Initiator' => $this->config->getInitiator(),
                 'SecurityCredential' => $this->config->getSecurityCredential(),
                 'CommandID' => MpesaConstants::MPESA_COMMAND_ID_TRANSACTION_STATUS_QUERY,
@@ -153,7 +153,7 @@ class Mpesa
                 'ResultURL' => $this->config->getResultURL(),
                 'Occasion' => $occasion,
             ],
-            headers: [
+            [
                 'Authorization' => sprintf("Bearer %s", $this->config->getAuth()->getToken() )
             ]
         );
@@ -205,12 +205,13 @@ class Mpesa
         $this->validateString( 'remarks', $remarks );
 
         $response = self::$http_client->request(
-            uri: $url,
-            method: 'POST',
-            body: [
+            $url,
+            'POST',
+            [
                 'Initiator' => $this->config->getInitiator(),
                 'SecurityCredential' => $this->config->getSecurityCredential(),
                 'CommandID' => MpesaConstants::MPESA_COMMAND_ID_TRANSACTION_REVERSAL,
+                'TransactionID' => $transaction_id,
                 'PartyA' => $this->config->getShortCode(),
                 'Amount' => $amount,
                 'IdentifierType' => $this->config->getIdentifierType(),
@@ -221,7 +222,7 @@ class Mpesa
                 'ResultURL' => $this->config->getResultURL(),
                 'Occasion' => $occasion,
             ],
-            headers: [
+            [
                 'Authorization' => sprintf("Bearer %s", $this->config->getAuth()->getToken() )
             ]
         );

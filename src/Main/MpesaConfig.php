@@ -25,6 +25,15 @@ class MpesaConfig
         // User credential
         'initiator_name' => '',
         'initiator_password' => '',
+
+        // or use this
+        'security_credential' => '',
+
+        // or, used together with the user credentials
+        'sandbox_certificate_path' => '',
+        'production_certificate_path' => '',
+
+        // Lipa na mpesa online passkey
         'passkey' => '',
 
         // Short code
@@ -46,17 +55,16 @@ class MpesaConfig
         'queue_timeout_url' => '',
         'result_url' => '',
 
+        // Pull request
+        'organization_msisdn' => '',
+        'pull_callback_url' => '',
+
     ];
 
     /**
      * Will hold auth instance
      */
     protected ?MpesaAuth $auth = null;
-
-    /**
-     * Will hold the security credential
-     */
-    protected string $security_credential = ''; 
 
     /**
      * Indicates thats one or more of the security credential
@@ -135,8 +143,17 @@ class MpesaConfig
                         "Value of {$key} - '${value}' in your config must be a string"
                     );
                 }
+                
+                switch($key){
+                    // Special case
+                    case "identifier_type":
+                        $this->setShortCode($this->getShortCode(), trim($config[$key]));
+                        break;
 
-                $this->config[$key] = trim($config[$key]);
+                    default:
+                        $this->config[$key] = trim($config[$key]);
+                }
+                
             }
 
         }
@@ -502,6 +519,52 @@ class MpesaConfig
     }
 
     /**
+     * Set the pull request callback URL
+     * 
+     * @param string $value - The pull request callback URL
+    */
+    public function setPullCallbackURL(string $value): self
+    {
+        $this->config['pull_callback_url'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Get the callback URL 
+     * 
+     * @return string - The pull request callback url
+    */
+    public function getPullCallbackURL(): string
+    {
+        return $this->config['pull_callback_url'];
+    }
+
+    /**
+     * Set the organization MSISDN, required for pull requests
+     * 
+     * This is the number that receives the confirmation message
+     * 
+     * @param string - The value of the organization MSISDN
+     */
+    public function setOrganizationMSISDN(string $value): self
+    {
+        $this->config['organization_msisdn'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Get the organization MSISDN for the pull request
+     *
+     * @return string - the organization MSISDN
+     */
+    public function getOrganizationMSISDN(): string
+    {
+        return $this->config['organization_msisdn'];
+    }
+
+    /**
      * Helper function to quickly get a URL
      * 
      * @param string $name The name of the url, supported values are
@@ -634,7 +697,7 @@ class MpesaConfig
     */
     public function setSecurityCredential(string $value): self
     {
-        $this->security_credential = $value;
+        $this->config['security_credential'] = $value;
         $this->has_user_credentials_changed = false;
 
         return $this;
@@ -647,61 +710,21 @@ class MpesaConfig
      */
     public function getSecurityCredential(): string
     {
-        if( !$this->has_user_credentials_changed && $this->security_credential !== '' ) {
-            return $this->security_credential;
+        if(!$this->has_user_credentials_changed && $this->config['security_credential'] !== '') {
+            return $this->config['security_credential'];
         }
 
         // Get the path to correct cert
-        $cert_path =  realpath(
-            sprintf(
-                "%s/../../certificates/%s",
-                __DIR__,
-                $this->isSandboxEnvironment() ? 'sandbox.cer' : 'production.cer'
-            )
+        $cert_path = realpath(
+            $this->isSandboxEnvironment() ? 
+            $this->getSandboxCertificatePath() : 
+            $this->getProductionCertificatePath()
         );
 
         $encrypted = '';
         
         // Get the contents of the 
         $cert_content = file_get_contents($cert_path);
-
-        $cert_content = "-----BEGIN CERTIFICATE-----\n".
-            "MIIGgDCCBWigAwIBAgIKMvrulAAAAARG5DANBgkqhkiG9w0BAQsFADBbMRMwEQYK".
-            "CZImiZPyLGQBGRYDbmV0MRkwFwYKCZImiZPyLGQBGRYJc2FmYXJpY29tMSkwJwYD".
-            "VQQDEyBTYWZhcmljb20gSW50ZXJuYWwgSXNzdWluZyBDQSAwMjAeFw0xNDExMTIw".
-            "NzEyNDVaFw0xNjExMTEwNzEyNDVaMHsxCzAJBgNVBAYTAktFMRAwDgYDVQQIEwdO".
-            "YWlyb2JpMRAwDgYDVQQHEwdOYWlyb2JpMRAwDgYDVQQKEwdOYWlyb2JpMRMwEQYD".
-            "VQQLEwpUZWNobm9sb2d5MSEwHwYDVQQDExhhcGljcnlwdC5zYWZhcmljb20uY28u".
-            "a2UwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCotwV1VxXsd0Q6i2w0".
-            "ugw+EPvgJfV6PNyB826Ik3L2lPJLFuzNEEJbGaiTdSe6Xitf/PJUP/q8Nv2dupHL".
-            "BkiBHjpQ6f61He8Zdc9fqKDGBLoNhNpBXxbznzI4Yu6hjBGLnF5Al9zMAxTij6wL".
-            "GUFswKpizifNbzV+LyIXY4RR2t8lxtqaFKeSx2B8P+eiZbL0wRIDPVC5+s4GdpFf".
-            "Y3QIqyLxI2bOyCGl8/XlUuIhVXxhc8Uq132xjfsWljbw4oaMobnB2KN79vMUvyoR".
-            "w8OGpga5VoaSFfVuQjSIf5RwW1hitm/8XJvmNEdeY0uKriYwbR8wfwQ3E0AIW1Fl".
-            "MMghAgMBAAGjggMkMIIDIDAdBgNVHQ4EFgQUwUfE+NgGndWDN3DyVp+CAiF1Zkgw".
-            "HwYDVR0jBBgwFoAU6zLUT35gmjqYIGO6DV6+6HlO1SQwggE7BgNVHR8EggEyMIIB".
-            "LjCCASqgggEmoIIBIoaB1mxkYXA6Ly8vQ049U2FmYXJpY29tJTIwSW50ZXJuYWwl".
-            "MjBJc3N1aW5nJTIwQ0ElMjAwMixDTj1TVkRUM0lTU0NBMDEsQ049Q0RQLENOPVB1".
-            "YmxpYyUyMEtleSUyMFNlcnZpY2VzLENOPVNlcnZpY2VzLENOPUNvbmZpZ3VyYXRp".
-            "b24sREM9c2FmYXJpY29tLERDPW5ldD9jZXJ0aWZpY2F0ZVJldm9jYXRpb25MaXN0".
-            "P2Jhc2U/b2JqZWN0Q2xhc3M9Y1JMRGlzdHJpYnV0aW9uUG9pbnSGR2h0dHA6Ly9j".
-            "cmwuc2FmYXJpY29tLmNvLmtlL1NhZmFyaWNvbSUyMEludGVybmFsJTIwSXNzdWlu".
-            "ZyUyMENBJTIwMDIuY3JsMIIBCQYIKwYBBQUHAQEEgfwwgfkwgckGCCsGAQUFBzAC".
-            "hoG8bGRhcDovLy9DTj1TYWZhcmljb20lMjBJbnRlcm5hbCUyMElzc3VpbmclMjBD".
-            "QSUyMDAyLENOPUFJQSxDTj1QdWJsaWMlMjBLZXklMjBTZXJ2aWNlcyxDTj1TZXJ2".
-            "aWNlcyxDTj1Db25maWd1cmF0aW9uLERDPXNhZmFyaWNvbSxEQz1uZXQ/Y0FDZXJ0".
-            "aWZpY2F0ZT9iYXNlP29iamVjdENsYXNzPWNlcnRpZmljYXRpb25BdXRob3JpdHkw".
-            "KwYIKwYBBQUHMAGGH2h0dHA6Ly9jcmwuc2FmYXJpY29tLmNvLmtlL29jc3AwCwYD".
-            "VR0PBAQDAgWgMD0GCSsGAQQBgjcVBwQwMC4GJisGAQQBgjcVCIfPjFaEwsQDhemF".
-            "NoTe0Q2GoIgIZ4bBx2yDublrAgFkAgEMMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggr".
-            "BgEFBQcDATAnBgkrBgEEAYI3FQoEGjAYMAoGCCsGAQUFBwMCMAoGCCsGAQUFBwMB".
-            "MA0GCSqGSIb3DQEBCwUAA4IBAQBMFKlncYDI06ziR0Z0/reptIJRCMo+rqo/cUuP".
-            "KMmJCY3sXxFHs5ilNXo8YavgRLpxJxdZMkiUIVuVaBanXkz9/nMriiJJwwcMPjUV".
-            "9nQqwNUEqrSx29L1ARFdUy7LhN4NV7mEMde3MQybCQgBjjOPcVSVZXnaZIggDYIU".
-            "w4THLy9rDmUIasC8GDdRcVM8xDOVQD/Pt5qlx/LSbTNe2fekhTLFIGYXJVz2rcsj".
-            "k1BfG7P3pXnsPAzu199UZnqhEF+y/0/nNpf3ftHZjfX6Ws+dQuLoDN6pIl8qmok9".
-            "9E/EAgL1zOIzFvCRYlnjKdnsuqL1sIYFBlv3oxo6W1O+X9IZ\n".
-            "-----END CERTIFICATE-----";
 
         // Create the public key
         $public_key = openssl_pkey_get_public($cert_content);
@@ -719,9 +742,50 @@ class MpesaConfig
         }
 
         $this->has_user_credentials_changed = false;
-        $this->security_credential = base64_encode($encrypted);
+        $this->config['security_credential'] = base64_encode($encrypted);
 
-        return $this->security_credential;
+        return $this->config['security_credential'];
+    }
+
+    /**
+     * Set the path to the sandbox certificate path
+     * 
+     * @param string $value - The path to certificate
+     */
+    public function setSandboxCertificatePath(string $value): self
+    {
+        $this->config['sandbox_certificate_path'] = $value;
+
+        return $this;
+    }
+
+     /**
+     * Set the path to the production certificate path
+     * 
+     * @param string $value - The path to certificate
+     */
+    public function setProductionCertificatePath(string $value): self
+    {
+        $this->config['production_certificate_path'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return string the sandbox certificate path
+     */
+    public function getSandboxCertificatePath(): string
+    {
+        return $this->config['sandbox_certificate_path'] !== '' ? 
+            $this->config['sandbox_certificate_path'] :
+            __DIR__ . "%s/../../certificates/sandbox.cer";
+    }
+
+    public function getProductionCertificatePath(): string
+    {
+        return $this->config['production_certificate_path'] !== '' ? 
+            $this->config['production_certificate_path'] :
+            __DIR__ . "%s/../../certificates/sandbox.cer";
     }
 
     /**
@@ -766,7 +830,15 @@ class MpesaConfig
             );
         }
 
-        $this->config[$key] = $value;
+        // Special case, requires validation check
+        if($key === 'identifier_type'){
+            $this->setShortCode(
+                $this->getShortCode(),
+                $value
+            );
+        } else {
+            $this->config[$key] = $value;
+        }
 
         return $this;
     }
