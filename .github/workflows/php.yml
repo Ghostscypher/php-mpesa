@@ -10,6 +10,45 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      # The api env
+      APP_ENV: sandbox
+
+      # The credentials
+      CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
+      CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
+
+      # Ngrok tunnel address
+      NGROK_ADDRESS: ${{ secrets.NGROK_ADDRESS }}
+
+      # Lipa na mpesa online passkey
+      PASSKEY: ${{ secrets.PASSKEY }}
+
+      # The user credentials
+      INITIATOR_NAME: testAPI497
+      INITIATOR_PASSWORD: Safaricom111!
+
+      ## OR
+      SECURITY_CREDENTIAL: 
+
+      # Shortcode related
+      SHORT_CODE: 601497
+      BUSINESS_SHORT_CODE: 601497
+
+      # Extras
+      SHORT_CODE_2: 600000
+
+      # Lipa na mpesa online
+      ONLINE_SHORT_CODE: 174379
+
+      # Identifier
+      # 4 is paybill
+      IDENTIFIER_TYPE: 4
+
+      # Pull transaction
+      # ORGANIZATION_MSISDN:
+
+      # Any other envs can go here
 
     steps:
     - uses: actions/checkout@v2

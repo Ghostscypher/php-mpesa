@@ -22,7 +22,7 @@ class AuthenticationTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        (new DotEnv(__DIR__ . '/../../.env'))->load();
+        // (new DotEnv(__DIR__ . '/../../.env'))->load();
 
         self::$ngrok_address = getenv('NGROK_ADDRESS');
 
