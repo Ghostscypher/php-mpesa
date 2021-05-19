@@ -64,6 +64,7 @@ class MpesaAuth
         $response = self::$http_client->request(
             'GET',
             $auth_url,
+            [],
             [
                 'Authorization' => sprintf(
                     'Basic %s', 

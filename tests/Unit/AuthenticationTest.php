@@ -76,8 +76,6 @@ class AuthenticationTest extends TestCase
             
         ];
 
-        echo getenv('CONSUMER_SECRET');
-
     } 
 
     protected function setUp(): void
@@ -91,7 +89,7 @@ class AuthenticationTest extends TestCase
         $this->assertIsString($this->mpesa->getConfig()->getAuth()->getToken());
     }
 
-    public function testAuthenticationWithIncorrectData()
+    public function testAuthenticationWithIncorrectCredentials()
     {
         $this->expectException(MpesaClientException::class);
 
@@ -102,7 +100,7 @@ class AuthenticationTest extends TestCase
         $this->assertIsString($this->mpesa->getConfig()->getAuth()->getToken());
     }
 
-    public function testAuthenticationWithInvalidData()
+    public function testAuthenticationWithMissingCredentials()
     {
         $this->expectException(MpesaInternalException::class);
 
