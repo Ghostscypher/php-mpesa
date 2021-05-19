@@ -76,6 +76,8 @@ class AuthenticationTest extends TestCase
             
         ];
 
+        echo getenv('CONSUMER_SECRET');
+
     } 
 
     protected function setUp(): void
