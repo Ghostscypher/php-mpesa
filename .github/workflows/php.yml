@@ -55,6 +55,9 @@ jobs:
 
     - name: Validate composer.json and composer.lock
       run: composer validate --strict
+    
+    - name: copy .env file
+      run: cp .env.example .env
 
     - name: Cache Composer packages
       id: composer-cache
