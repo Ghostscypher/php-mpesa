@@ -2,6 +2,7 @@
 
 namespace Hackdelta\Mpesa\Tests\Unit;
 
+use Hackdelta\Mpesa\Exceptions\MpesaClientException;
 use Hackdelta\Mpesa\Exceptions\MpesaInternalException;
 use Hackdelta\Mpesa\Extras\MpesaConstants;
 use Hackdelta\Mpesa\Main\MpesaConfig;
@@ -75,8 +76,6 @@ class AuthenticationTest extends TestCase
             
         ];
 
-        echo getenv('SHORT_CODE');
-        
     } 
 
     protected function setUp(): void
@@ -92,11 +91,22 @@ class AuthenticationTest extends TestCase
 
     public function testAuthenticationWithIncorrectData()
     {
-        $this->expectException(MpesaInternalException::class);
+        $this->expectException(MpesaClientException::class);
 
         $this->mpesa->getConfig()
             ->setConsumerKey("Incorrect")
             ->setConsumerSecret("Data");
+
+        $this->assertIsString($this->mpesa->getConfig()->getAuth()->getToken());
+    }
+
+    public function testAuthenticationWithInvalidData()
+    {
+        $this->expectException(MpesaInternalException::class);
+
+        $this->mpesa->getConfig()
+            ->setConsumerKey("")
+            ->setConsumerSecret("");
 
         $this->assertIsString($this->mpesa->getConfig()->getAuth()->getToken());
     }
