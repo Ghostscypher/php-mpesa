@@ -55,13 +55,13 @@ class MpesaB2B
         $this->validateString('initiator_name', $this->config->getInitiator());
         $this->validateString('security_credential', $this->config->getSecurityCredential());
 
-        $this->validateArray('command_id', $command_id, [
-            MpesaConstants::MPESA_COMMAND_ID_BUSINESS_PAY_BILL,
-            MpesaConstants::MPESA_COMMAND_ID_MERCHANT_TO_MERCHANT_TRANSFER,
-            MpesaConstants::MPESA_COMMAND_ID_MERCHANT_FROM_MERCHANT_TO_WORKING,
-            MpesaConstants::MPESA_COMMAND_ID_MERCHANT_TO_MMF,
-            MpesaConstants::MPESA_COMMAND_ID_AGENCY_FLOAT_ADVANCE,
-        ]);
+        // $this->validateArray('command_id', $command_id, [
+        //     MpesaConstants::MPESA_COMMAND_ID_BUSINESS_PAY_BILL,
+        //     MpesaConstants::MPESA_COMMAND_ID_MERCHANT_TO_MERCHANT_TRANSFER,
+        //     MpesaConstants::MPESA_COMMAND_ID_MERCHANT_FROM_MERCHANT_TO_WORKING,
+        //     MpesaConstants::MPESA_COMMAND_ID_MERCHANT_TO_MMF,
+        //     MpesaConstants::MPESA_COMMAND_ID_AGENCY_FLOAT_ADVANCE,
+        // ]);
 
         $this->validateArray('reciever_identifier_type', $receiver_identifier_type, [
             MpesaConstants::MPESA_IDENTIFIER_TYPE_MSISDN,

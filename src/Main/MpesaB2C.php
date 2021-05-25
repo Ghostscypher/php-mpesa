@@ -55,11 +55,11 @@ class MpesaB2C
         $this->validateString( 'initiator_name', $this->config->getInitiator() );
         $this->validateString( 'security_credential', $this->config->getSecurityCredential() );
         
-        $this->validateArray( 'command_id', $command_id, [
-            MpesaConstants::MPESA_COMMAND_ID_BUSINESS_PAYMENT,
-            MpesaConstants::MPESA_COMMAND_ID_SALARY_PAYMENT,
-            MpesaConstants::MPESA_COMMAND_ID_PROMOTION_PAYMENT,
-        ]);
+        // $this->validateArray( 'command_id', $command_id, [
+        //     MpesaConstants::MPESA_COMMAND_ID_BUSINESS_PAYMENT,
+        //     MpesaConstants::MPESA_COMMAND_ID_SALARY_PAYMENT,
+        //     MpesaConstants::MPESA_COMMAND_ID_PROMOTION_PAYMENT,
+        // ]);
 
         $this->validateInt( 'amount', $amount, 1 );
         $this->validateString('short_code', $this->config->getShortCode() );
