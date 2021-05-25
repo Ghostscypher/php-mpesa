@@ -7,9 +7,9 @@ use Hackdelta\Mpesa\Extras\Validatable;
 
 /**
  * This class will contain methods for generating authentication tokens, and managing the
- * whole token lifecycle
+ * whole token lifecycle.
  */
-class MpesaAuth 
+class MpesaAuth
 {
     use Validatable;
 
@@ -22,12 +22,14 @@ class MpesaAuth
 
     public function __construct(MpesaConfig $config)
     {
-        $this->validateString( 'Consumer key', $config->getConsumerKey() );
-        $this->validateString( 'Consumer secret', $config->getConsumerSecret() );
+        $this->validateString('Consumer key', $config->getConsumerKey());
+        $this->validateString('Consumer secret', $config->getConsumerSecret());
 
         $this->config = $config;
 
-        if( self::$http_client === null ) { self::$http_client = new MpesaHttp($this->config); }
+        if (self::$http_client === null) {
+            self::$http_client = new MpesaHttp($this->config);
+        }
     }
 
     public function setAuthToken(string $token, int $expires_at_timestamp): self
@@ -38,10 +40,10 @@ class MpesaAuth
         return $this;
     }
 
-    public function setConfig(MpesaConfig $config): self 
+    public function setConfig(MpesaConfig $config): self
     {
-        $this->validateString( 'consumer_key', $config->getConsumerKey() );
-        $this->validateString( 'consumer_secret', $config->getConsumerSecret() );
+        $this->validateString('consumer_key', $config->getConsumerKey());
+        $this->validateString('consumer_secret', $config->getConsumerSecret());
 
         $this->config = $config;
 
@@ -53,11 +55,11 @@ class MpesaAuth
         return $this->config;
     }
 
-    private function refreshToken(): void 
+    private function refreshToken(): void
     {
         $auth_url = sprintf(
-            "%s%s", 
-            $this->config->getBaseURL(), 
+            '%s%s',
+            $this->config->getBaseURL(),
             MpesaConstants::MPESA_URIS['generate_token']
         );
 
@@ -67,28 +69,28 @@ class MpesaAuth
             [],
             [
                 'Authorization' => sprintf(
-                    'Basic %s', 
-                    $this->config->getCredentials() 
+                    'Basic %s',
+                    $this->config->getCredentials()
                 ),
             ]
         );
 
-        
         // Mark token as has changed
-        if($this->expires_at !== 0) { $this->has_token_changed = true; }
+        if ($this->expires_at !== 0) {
+            $this->has_token_changed = true;
+        }
 
         // Decode the JSON data returned
-        $json_data = json_decode( $response->getJSONString(), true);
-        
+        $json_data = json_decode($response->getJSONString(), true);
+
         // Set the tokens
         $this->token = $json_data['access_token'];
-        $this->expires_at = time() + (int)$json_data['expires_in'];
+        $this->expires_at = time() + (int) $json_data['expires_in'];
     }
 
     public function getAuthToken(bool $force = false): self
     {
-        if( !$force && !$this->hasExpired() )
-        {
+        if (!$force && !$this->hasExpired()) {
             return $this;
         }
 
@@ -97,12 +99,12 @@ class MpesaAuth
         return $this;
     }
 
-    public function hasExpired(): bool 
+    public function hasExpired(): bool
     {
         return ($this->expires_at - time()) <= 0;
     }
 
-    public function getExpiresAtTime(): int 
+    public function getExpiresAtTime(): int
     {
         return $this->expired_at;
     }
@@ -119,5 +121,4 @@ class MpesaAuth
     {
         return $this->has_token_changed;
     }
-
 }

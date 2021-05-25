@@ -3,16 +3,16 @@
 namespace Hackdelta\Mpesa\Extras;
 
 /**
- * This class stores constants that will be used throughout the mpesa app
+ * This class stores constants that will be used throughout the mpesa app.
  */
-class MpesaConstants {
-    
+class MpesaConstants
+{
     /**
-     * Defines the mpesa endpoints
-    */
+     * Defines the mpesa endpoints.
+     */
     public const MPESA_URIS = [
         // Base uris
-        'base_uri' => 'https://api.safaricom.co.ke',
+        'base_uri'         => 'https://api.safaricom.co.ke',
         'sandbox_base_uri' => 'https://sandbox.safaricom.co.ke',
 
         // Auth endpoint
@@ -27,19 +27,19 @@ class MpesaConstants {
         'simulate_c2b' => '/mpesa/c2b/v1/simulate',
 
         // Transaction queries
-        'account_balance' => '/mpesa/accountbalance/v1/query',
+        'account_balance'    => '/mpesa/accountbalance/v1/query',
         'transaction_status' => '/mpesa/transactionstatus/v1/query',
 
         // Reversal
         'reversal' => '/mpesa/reversal/v1/request',
 
         // Stk related
-        'stk_push' => '/mpesa/stkpush/v1/processrequest',
+        'stk_push'       => '/mpesa/stkpush/v1/processrequest',
         'stk_push_query' => '/mpesa/stkpushquery/v1/query',
 
         // Pull transactions API
         'pull_transaction_register' => '/pulltransactions/v1/register',
-        'pull_transaction_query' => '/pulltransactions/v1/query',
+        'pull_transaction_query'    => '/pulltransactions/v1/query',
 
     ];
 
@@ -69,7 +69,6 @@ class MpesaConstants {
     public const MPESA_COMMAND_ID_MERCHANT_TO_MMF = 'MerchantServicesMMFAccountTransfer';
     public const MPESA_COMMAND_ID_AGENCY_FLOAT_ADVANCE = 'AgencyFloatAdvance';
 
-    
     // Http codes
     // 2xx series
     public const MPESA_HTTP_OK = 200;
@@ -87,7 +86,6 @@ class MpesaConstants {
     public const MPESA_HTTP_INTERNAL_SERVER_ERROR = 500;
     public const MPESA_HTTP_SERVICE_UNAVAILABLE = 503;
 
-
     // Gateway to client status code
     public const MPESA_GATEWAY_TO_CLIENT_SUCCESS = 0;
 
@@ -101,7 +99,7 @@ class MpesaConstants {
     // User input related
     public const MPESA_GATEWAY_TO_CLIENT_UNRESOLVED_PRIMARY_PARTY = 6;
     public const MPESA_GATEWAY_TO_CLIENT_UNRESOLVED_RECEIVER_PARTY = 7;
-    
+
     // Fund
     public const MPESA_GATEWAY_TO_CLIENT_WOULD_EXCEED_MAXIMUM_BALANCE = 8;
 
@@ -116,13 +114,12 @@ class MpesaConstants {
     // Server
     public const MPESA_GATEWAY_TO_CLIENT_DUPLICATE_DETECTED = 15;
     public const MPESA_GATEWAY_TO_CLIENT_INTERNAL_FAILURE = 17;
-    
+
     // User input
     public const MPESA_GATEWAY_TO_CLIENT_UNRESOLVED_INITIATOR = 20;
-    
+
     // Server
     public const MPESA_GATEWAY_TO_CLIENT_TRAFFIC_BLOCKING_CONDITION_IN_PLACE = 26;
-    
 
     // Client to gateway status code
     public const MPESA_CLIENT_TO_GATEWAY_SUCCESS_C2B = '0';
@@ -131,5 +128,4 @@ class MpesaConstants {
 
     // MPesa request PULL request
     public const MPESA_REQUEST_TYPE_PULL = 'Pull';
-
 }
