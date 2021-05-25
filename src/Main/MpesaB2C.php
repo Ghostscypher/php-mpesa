@@ -42,8 +42,9 @@ class MpesaB2C
         string $to,
         string $command_id,
         string $remarks = 'remarks',
-        string $occasion = '',
-    ): MpesaResponse {
+        string $occasion = ''
+    ): MpesaResponse 
+    {
         $url = sprintf(
             "%s%s", 
             $this->config->getBaseURL(), 

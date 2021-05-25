@@ -119,7 +119,7 @@ class Mpesa
     public function checkTransactionStatus(
         string $transaction_id,
         string $remarks='remarks',
-        string $occasion=' ',
+        string $occasion=' '
     ): MpesaResponse {
         $url = sprintf(
             "%s%s", 

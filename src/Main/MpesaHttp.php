@@ -20,7 +20,7 @@ class MpesaHttp
         string $method,
         string $uri, 
         ?array $body = null, 
-        ?array $headers = null,
+        ?array $headers = null
     ): MpesaResponse {
         try{
             $response = $this->client($method, $uri, $body, $headers);
