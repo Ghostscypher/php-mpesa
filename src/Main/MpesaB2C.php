@@ -51,9 +51,9 @@ class MpesaB2C
         );
 
         // Validate that data is correct
-        $this->validateString( 'initiator_name', $this->config->getInitiator() );
-        $this->validateString( 'security_credential', $this->config->getSecurityCredential() );
-        
+        $this->validateString('initiator_name', $this->config->getInitiator());
+        $this->validateString('security_credential', $this->config->getSecurityCredential());
+
         // $this->validateArray( 'command_id', $command_id, [
         //     MpesaConstants::MPESA_COMMAND_ID_BUSINESS_PAYMENT,
         //     MpesaConstants::MPESA_COMMAND_ID_SALARY_PAYMENT,
