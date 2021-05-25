@@ -21,8 +21,7 @@ class MpesaHttp
         string $uri, 
         ?array $body = null, 
         ?array $headers = null,
-    ): MpesaResponse
-    {
+    ): MpesaResponse {
         try{
             $response = $this->client($method, $uri, $body, $headers);
 

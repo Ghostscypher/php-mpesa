@@ -1,4 +1,5 @@
 # Php mpesa library
+
 [![Latest Stable Version](https://poser.pugx.org/hackdelta/mpesa/v)](//packagist.org/packages/hackdelta/mpesa)
 [![Total Downloads](https://poser.pugx.org/hackdelta/mpesa/downloads)](//packagist.org/packages/hackdelta/mpesa)
 [![Latest Unstable Version](https://poser.pugx.org/hackdelta/mpesa/v/unstable)](//packagist.org/packages/hackdelta/mpesa)
@@ -43,7 +44,7 @@ repository platform. Here is how we work with Git:
 8. Get your code approved by the project lead before pushing to master
    and deploying to production.
 
-# Getting Help
+## Getting Help
 
 In case of any assistance regarding the project, you can escalate the
 issue on the project's issue board.

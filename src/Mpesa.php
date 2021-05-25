@@ -120,8 +120,7 @@ class Mpesa
         string $transaction_id,
         string $remarks='remarks',
         string $occasion=' ',
-    ): MpesaResponse
-    {
+    ): MpesaResponse {
         $url = sprintf(
             "%s%s", 
             $this->config->getBaseURL(), 
