@@ -664,11 +664,11 @@ class MpesaConfig
     {
         return base64_encode(
             sprintf(
-            '%s%s%s',
-            $this->getBusinessShortCode(),
-            $this->config['passkey'],
-            $timestamp
-        )
+                '%s%s%s',
+                $this->getBusinessShortCode(),
+                $this->config['passkey'],
+                $timestamp
+            )
         );
     }
 

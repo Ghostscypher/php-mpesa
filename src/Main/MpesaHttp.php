@@ -11,18 +11,17 @@ use Hackdelta\Mpesa\Exceptions\MpesaInternalException;
 use Hackdelta\Mpesa\Exceptions\MpesaServerException;
 
 /**
- * This class will contain methods to perform HTTP requests
+ * This class will contain methods to perform HTTP requests.
  */
-class MpesaHttp 
+class MpesaHttp
 {
-
     public function request(
         string $method,
-        string $uri, 
-        ?array $body = null, 
+        string $uri,
+        ?array $body = null,
         ?array $headers = null
     ): MpesaResponse {
-        try{
+        try {
             $response = $this->client($method, $uri, $body, $headers);
 
             return new MpesaResponse(
@@ -30,16 +29,16 @@ class MpesaHttp
                 json_encode($response->getHeaders()),
                 $response->getStatusCode()
             );
-        } catch(ClientException $ce){
+        } catch (ClientException $ce) {
             throw new MpesaClientException(
                 $ce->getMessage(),
                 $ce->getResponse()->getBody()->getContents(),
                 $ce->getResponse()->getStatusCode(),
                 [
-                    "url" => $uri,
-                    "method" => $method,
-                    "headers" => $headers,
-                    "body" => $body,
+                    'url'     => $uri,
+                    'method'  => $method,
+                    'headers' => $headers,
+                    'body'    => $body,
                 ]
             );
         } catch (ServerException $se) {
@@ -48,45 +47,43 @@ class MpesaHttp
                 $se->getResponse()->getBody()->getContents(),
                 $se->getResponse()->getStatusCode(),
                 [
-                    "url" => $uri,
-                    "method" => $method,
-                    "headers" => $headers,
-                    "body" => $body,
+                    'url'     => $uri,
+                    'method'  => $method,
+                    'headers' => $headers,
+                    'body'    => $body,
                 ]
             );
-        } catch (GuzzleException $e){
-            throw new MpesaInternalException( $e->getMessage() );
+        } catch (GuzzleException $e) {
+            throw new MpesaInternalException($e->getMessage());
         }
     }
 
     private function client(
         string $method,
-        string $uri, 
-        ?array $body = null, 
+        string $uri,
+        ?array $body = null,
         ?array $headers = null
-    )
-    {
+    ) {
         $initial_config = [
-            'stream' => true,
+            'stream'  => true,
             'headers' => [
-                'Cache-Control' => 'no-cache',
-                'Accept' => 'application/json',
+                'Cache-Control'   => 'no-cache',
+                'Accept'          => 'application/json',
                 'Accept-Encoding' => 'application/json',
-                'Content-Type' => 'application/json',
-            ]
+                'Content-Type'    => 'application/json',
+            ],
         ];
-        
+
         // Merge the headers
-        if($headers !== null) {
-            $initial_config["headers"] = array_merge($headers, $initial_config["headers"]);
+        if ($headers !== null) {
+            $initial_config['headers'] = array_merge($headers, $initial_config['headers']);
         }
 
         // Init the HTTP client class
         $client = new Client($initial_config);
 
         return $client->request($method, $uri, [
-            'json' => $body ?? []
+            'json' => $body ?? [],
         ]);
     }
-
 }
