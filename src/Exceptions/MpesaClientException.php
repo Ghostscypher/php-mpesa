@@ -8,15 +8,15 @@ use Exception;
  * Indicates client exceptions, that is an error in the request body of the client, this occurs if the
  * data passed the internal error check, and the client has sent a request to safaricom.
  * This is the 4xx error code series.
- * This will wrap around the guzzle client error exception
+ * This will wrap around the guzzle client error exception.
  */
-class MpesaClientException extends Exception 
+class MpesaClientException extends Exception
 {
     protected string $error_body = '';
     protected int $status_code = 0;
     protected ?array $request_parameters = null;
 
-    public function __construct(string $message, string $error_body, int $status_code, ?array $request_parameters = null) 
+    public function __construct(string $message, string $error_body, int $status_code, ?array $request_parameters = null)
     {
         parent::__construct($message);
 
@@ -40,5 +40,4 @@ class MpesaClientException extends Exception
     {
         return $this->request_parameters;
     }
-
 }
