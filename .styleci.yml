@@ -6,9 +6,7 @@ php:
   use-tabs: false
   finder:
     exclude:
-      - "modules"
-      - "node_modules"
-      - "storage"
+      - "certificates"
       - "vendor"
     name: "*.php"
     not-name:
