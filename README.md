@@ -1,4 +1,9 @@
 # Php mpesa library
+[![Latest Stable Version](https://poser.pugx.org/hackdelta/mpesa/v)](//packagist.org/packages/hackdelta/mpesa)
+[![Total Downloads](https://poser.pugx.org/hackdelta/mpesa/downloads)](//packagist.org/packages/hackdelta/mpesa)
+[![Latest Unstable Version](https://poser.pugx.org/hackdelta/mpesa/v/unstable)](//packagist.org/packages/hackdelta/mpesa)
+[![License](https://poser.pugx.org/hackdelta/mpesa/license)](//packagist.org/packages/hackdelta/mpesa)
+[![PHPUnit Status](https://github.com/Ghostscypher/php-mpesa/actions/workflows/php.yml/badge.svg?branch=main)](https://github.com/Ghostscypher/php-mpesa/actions?query=branch%3Amain)
 
 ## Introduction
 
