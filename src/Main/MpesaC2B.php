@@ -71,7 +71,7 @@ class MpesaC2B
     public function simulate(string $MSISDN, int $amount, $account_reference = ''): MpesaResponse
     {
         if ($this->config->isProductionEnvironment()) {
-            throw new MpesaInternalException("This can only work in sandbox");
+            throw new MpesaInternalException('This can only work in sandbox');
         }
 
         $url = sprintf(
@@ -198,5 +198,4 @@ class MpesaC2B
 
         return $response;
     }
-
 }
