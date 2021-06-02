@@ -176,9 +176,21 @@ class MpesaConfig
      *
      * @param bool $is_sandbox - Set to true if environment is sandbox, by default environment is sandbox
      */
-    public function setEnvironment(bool $is_sandbox): self
+    public function setSandboxEnvironment(bool $is_sandbox): self
     {
         $this->config['environment'] = $is_sandbox ? 'sandbox' : 'production';
+
+        return $this;
+    }
+
+    /**
+     * Sets the environment.
+     *
+     * @param bool $is_production - Set to true if environment is production, by default environment is sandbox
+     */
+    public function setProductionEnvironment(bool $is_production): self
+    {
+        $this->config['environment'] = $is_production ? 'production' : 'sandbox';
 
         return $this;
     }

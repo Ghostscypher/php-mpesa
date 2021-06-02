@@ -308,6 +308,19 @@ class Mpesa {
         optional occasion=' ': string
     );
 
+    // Register pull request endpoint
+    public MpesaResponse pullRequestRegisterURL(); 
+
+    // Perform a pull request query
+    // start_date: The start period of the missing transactions in the 
+    //      format of 2019-07-31 20:35:21 or 2019-07-31 19:00
+    // end_date: The end of the period for the missing transactions in the 
+    //          format of 2019-07-31 20:35:21 or 2019-07-31 22:35
+    // offset: Starts from 0. The service uses offset as opposed to page numbers. 
+    //      The OFF SET value allows you to specify which row to start from retrieving 
+    //      data. Suppose you wanted to show results 101-200. With the 
+    //      OFFSET keyword you type the (page number/index/offset value) 100.
+    public MpesaResponse pullRequestQuery(start_date: string, end_date: string, offset: int = 0); 
 }
 ```
 
@@ -497,7 +510,8 @@ class MpesaConfig {
 
     // Set development environment
     // Only accepts sandbox, production
-    public MpesaConfig setEnvironment(is_sandbox: boolean);
+    public MpesaConfig setSandboxEnvironment(is_sandbox: boolean);
+    public MpesaConfig setProductionEnvironment(is_production: boolean);
 
     // Return the development environment as string
     public String getEnvironment();
@@ -787,20 +801,6 @@ class MpesaC2B {
         checkout_request_id: string, 
         optional timestamp = '': string
     );
-
-    // Register pull request endpoint
-    public MpesaResponse pullRequestRegisterURL(); 
-
-    // Perform a pull request query
-    // start_date: The start period of the missing transactions in the 
-    //      format of 2019-07-31 20:35:21 or 2019-07-31 19:00
-    // end_date: The end of the period for the missing transactions in the 
-    //          format of 2019-07-31 20:35:21 or 2019-07-31 22:35
-    // offset: Starts from 0. The service uses offset as opposed to page numbers. 
-    //      The OFF SET value allows you to specify which row to start from retrieving 
-    //      data. Suppose you wanted to show results 101-200. With the 
-    //      OFFSET keyword you type the (page number/index/offset value) 100.
-    public MpesaResponse pullRequestQuery(start_date: string, end_date: string, offset: int = 0); 
 
 }
 

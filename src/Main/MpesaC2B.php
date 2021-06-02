@@ -2,6 +2,7 @@
 
 namespace Hackdelta\Mpesa\Main;
 
+use Hackdelta\Mpesa\Exceptions\MpesaInternalException;
 use Hackdelta\Mpesa\Extras\MpesaConstants;
 use Hackdelta\Mpesa\Extras\Validatable;
 
@@ -69,6 +70,10 @@ class MpesaC2B
 
     public function simulate(string $MSISDN, int $amount, $account_reference = ''): MpesaResponse
     {
+        if ($this->config->isProductionEnvironment()) {
+            throw new MpesaInternalException("This can only work in sandbox");
+        }
+
         $url = sprintf(
             '%s%s',
             $this->config->getBaseURL(),
@@ -194,80 +199,4 @@ class MpesaC2B
         return $response;
     }
 
-    /**
-     * Register pull request endpoint.
-     */
-    public function pullRequestRegisterURL(): MpesaResponse
-    {
-        $url = sprintf(
-            '%s%s',
-            $this->config->getBaseURL(),
-            MpesaConstants::MPESA_URIS['pull_transaction_register']
-        );
-
-        // Validate that data is correct
-        $this->validateString('short_code', $this->config->getShortCode());
-        $this->validateString('nominated_number', $this->config->getOrganizationMSISDN());
-        $this->validateString('passkey', $this->config->getPasskey());
-        $this->validateString('pull_callback_url', $this->config->getPullCallbackURL());
-
-        $response = self::$http_client->request(
-            'POST',
-            $url,
-            [
-                'ShortCode'       => $this->config->getShortCode(),
-                'RequestType'     => MpesaConstants::MPESA_REQUEST_TYPE_PULL,
-                'NominatedNumber' => $this->config->getOrganizationMSISDN(),
-                'CallBackURL'     => $this->config->getPullCallbackURL(),
-            ],
-            [
-                'Authorization' => sprintf('Bearer %s', $this->config->getAuth()->getToken()),
-            ]
-        );
-
-        return $response;
-    }
-
-    /**
-     * Perform a pull request query.
-     *
-     * @param string $start_date: The start period of the missing transactions in the
-     *                            format of 2019-07-31 20:35:21 or 2019-07-31 19:00
-     * @param string $end_date:   The end of the period for the missing transactions in the
-     *                            format of 2019-07-31 20:35:21 or 2019-07-31 22:35
-     * @param string $offset:     Starts from 0. The service uses offset as opposed to page numbers.
-     *                            The OFF SET value allows you to specify which row to start from retrieving
-     *                            data. Suppose you wanted to show results 101-200. With the
-     *                            OFFSET keyword you type the (page number/index/offset value) 100.
-     */
-    public function pullRequestQuery(string $start_date, string $end_date, int $offset = 0): MpesaResponse
-    {
-        $url = sprintf(
-            '%s%s',
-            $this->config->getBaseURL(),
-            MpesaConstants::MPESA_URIS['pull_transaction_query']
-        );
-
-        // Validate that data is correct
-        $this->validateString('short_code', $this->config->getShortCode());
-        $this->validateString('start_date', $start_date);
-        $this->validateString('end_date', $end_date);
-        $this->validateInt('offset', $offset, 0);
-
-        $response = self::$http_client->request(
-            $url,
-            'POST',
-            [
-                'ShortCode'   => $this->config->getShortCode(),
-                'StartDate'   => $start_date,
-                'EndDate'     => $end_date,
-                'OffSetValue' => $offset,
-            ],
-            [
-                'Authorization' => sprintf('Bearer %s', $this->config->getAuth()->getToken()),
-            ]
-        );
-
-        return $response;
-    }
 }

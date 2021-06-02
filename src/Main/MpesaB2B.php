@@ -64,7 +64,6 @@ class MpesaB2B
         // ]);
 
         $this->validateArray('reciever_identifier_type', $receiver_identifier_type, [
-            MpesaConstants::MPESA_IDENTIFIER_TYPE_MSISDN,
             MpesaConstants::MPESA_IDENTIFIER_TYPE_PAYBILL,
             MpesaConstants::MPESA_IDENTIFIER_TYPE_TILL,
             MpesaConstants::MPESA_IDENTIFIER_TYPE_SHORTCODE,
