@@ -303,5 +303,4 @@ class Mpesa
 
         return $response;
     }
-    
 }
