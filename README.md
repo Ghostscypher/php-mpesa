@@ -52,6 +52,7 @@ You can install the package via composer
 
 ## Usage
 
+In order to check for recent changes kindly check the [Changelog](CHANGELOG.md)
 The purpose of this package is to wrap around Mpesa APIs in order to provide an easier
 and much neater methods. This library uses [Guzzle http library](https://github.com/guzzle/guzzle)
 under the hood for http requests.
@@ -957,7 +958,7 @@ try{
    echo $response->getJSONString();
 
 } catch(MpesaInternalException $e) {
-   // This exception occurs when a configuration is missing e.g. consumer key
+   // This exception occurs hen a configuration is missing e.g. consumer key
    echo $e->getMessage();
 
 } catch(MpesaClientException $ce){
@@ -986,7 +987,7 @@ try{
 
 ### Request for reversal (General)
 
-Used to check for account balance for the shortcode
+Used to reverse a transaction
 
 ```php
 use Hackdelta\Mpesa\Mpesa;
