@@ -53,6 +53,7 @@ You can install the package via composer
 ## Usage
 
 In order to check for recent changes kindly check the [Changelog](CHANGELOG.md)
+
 The purpose of this package is to wrap around Mpesa APIs in order to provide an easier
 and much neater methods. This library uses [Guzzle http library](https://github.com/guzzle/guzzle)
 under the hood for http requests.

@@ -98,8 +98,8 @@ class MpesaB2B
         }
 
         $response = self::$http_client->request(
-            $url,
             'POST',
+            $url,
             $temp,
             [
                 'Authorization' => sprintf('Bearer %s', $this->config->getAuth()->getToken()),

@@ -93,8 +93,8 @@ class Mpesa
         $this->validateString('remarks', $remarks);
 
         $response = self::$http_client->request(
-            $url,
             'POST',
+            $url,
             [
                 'Initiator'          => $this->config->getInitiator(),
                 'SecurityCredential' => $this->config->getSecurityCredential(),
@@ -139,8 +139,8 @@ class Mpesa
         $this->validateString('remarks', $remarks);
 
         $response = self::$http_client->request(
-            $url,
             'POST',
+            $url,
             [
                 'Initiator'          => $this->config->getInitiator(),
                 'SecurityCredential' => $this->config->getSecurityCredential(),
@@ -203,8 +203,8 @@ class Mpesa
         $this->validateString('remarks', $remarks);
 
         $response = self::$http_client->request(
-            $url,
             'POST',
+            $url,
             [
                 'Initiator'              => $this->config->getInitiator(),
                 'SecurityCredential'     => $this->config->getSecurityCredential(),
@@ -288,8 +288,8 @@ class Mpesa
         $this->validateInt('offset', $offset, 0);
 
         $response = self::$http_client->request(
-            $url,
             'POST',
+            $url,
             [
                 'ShortCode'   => $this->config->getShortCode(),
                 'StartDate'   => $start_date,

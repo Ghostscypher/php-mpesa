@@ -1,6 +1,7 @@
 vendor/
 .vscode/
 .idea/
+tests/unit/temp.php
 .phpunit.result.cache
 .env
 .DS_STORE

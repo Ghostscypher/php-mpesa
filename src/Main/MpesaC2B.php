@@ -52,8 +52,8 @@ class MpesaC2B
         $this->validateString('validation_url', $this->config->getValidationURL());
 
         $response = self::$http_client->request(
-            $url,
             'POST',
+            $url,
             [
                 'ShortCode'       => $this->config->getShortCode(),
                 'ResponseType'    => ' ',
@@ -100,8 +100,8 @@ class MpesaC2B
         }
 
         $response = self::$http_client->request(
-            $url,
             'POST',
+            $url,
             $temp,
             [
                 'Authorization' => sprintf('Bearer %s', $this->config->getAuth()->getToken()),
@@ -140,8 +140,8 @@ class MpesaC2B
         $this->validateString('stk_callback_url', $this->config->getSTKCallbackURL());
 
         $response = self::$http_client->request(
-            $url,
             'POST',
+            $url,
             [
                 'BusinessShortCode' => $this->config->getBusinessShortCode(),
                 'Password'          => $this->config->getPassword($my_timestamp),
@@ -183,8 +183,8 @@ class MpesaC2B
         }
 
         $response = self::$http_client->request(
-            $url,
             'POST',
+            $url,
             [
                 'BusinessShortCode' => $this->config->getBusinessShortCode(),
                 'Password'          => $this->config->getPassword($my_timestamp),
