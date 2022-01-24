@@ -29,7 +29,7 @@ jobs:
       INITIATOR_PASSWORD: Safaricom111!
 
       ## OR
-      SECURITY_CREDENTIAL: 
+      SECURITY_CREDENTIAL: ''
 
       # Shortcode related
       SHORT_CODE: 601497
