@@ -59,6 +59,9 @@ class Mpesa
             self::$C2B;
     }
 
+    /**
+     * @deprecated - This set of API is no longer supported
+     */
     public function B2B(): MpesaB2B
     {
         return self::$B2B === null ?
@@ -161,18 +164,15 @@ class Mpesa
         return $response;
     }
 
-    // Initiate reversal request
-    // transaction_id: The Mpesa code.
-    // amount: The amount that is being reversed
-    // receiver_party: the shortcode, or MSISDN that received the payment
-    // receiver_identifier_type: constant that shows the receiver identifier type
-    //         possible values are; MPESA_IDENTIFIER_TYPE_MSISDN, MPESA_IDENTIFIER_TYPE_TILL,
-    //                MPESA_IDENTIFIER_TYPE_PAYBILL , MPESA_IDENTIFIER_TYPE_SHORTCODE
+    /** 
+     * Initiate reversal request
+     * transaction_id: The Mpesa code.
+     * amount: The amount that is being reversed
+     * @deprecated This API is no longer supported
+    */
     public function reverseTransaction(
         string $transaction_id,
         int $amount,
-        string $receiver_party,
-        string $receiver_identifier_type,
         string $remarks = 'remarks',
         string $occasion = ''
     ): MpesaResponse {
@@ -187,14 +187,6 @@ class Mpesa
         $this->validateString('security_credential', $this->config->getSecurityCredential());
         $this->validateString('transaction_id', $transaction_id);
         $this->validateInt('amount', $amount, 1);
-        $this->validateString('reciever_party', $receiver_party);
-
-        $this->validateArray('reciever_identifier_type', $receiver_identifier_type, [
-            MpesaConstants::MPESA_IDENTIFIER_TYPE_MSISDN,
-            MpesaConstants::MPESA_IDENTIFIER_TYPE_PAYBILL,
-            MpesaConstants::MPESA_IDENTIFIER_TYPE_TILL,
-            MpesaConstants::MPESA_IDENTIFIER_TYPE_SHORTCODE,
-        ]);
 
         $this->validateString('short_code', $this->config->getShortCode());
         $this->validateString('queue_timeout_url', $this->config->getQueueTimeoutURL());
@@ -210,11 +202,9 @@ class Mpesa
                 'SecurityCredential'     => $this->config->getSecurityCredential(),
                 'CommandID'              => MpesaConstants::MPESA_COMMAND_ID_TRANSACTION_REVERSAL,
                 'TransactionID'          => $transaction_id,
-                'PartyA'                 => $this->config->getShortCode(),
                 'Amount'                 => $amount,
-                'IdentifierType'         => $this->config->getIdentifierType(),
-                'ReceiverParty'          => $receiver_party,
-                'RecieverIdentifierType' => $receiver_identifier_type,
+                'ReceiverParty'          => $this->config->getShortCode(),
+                'RecieverIdentifierType' => MpesaConstants::MPESA_IDENTIFIER_TYPE_REVERSAL,
                 'Remarks'                => $remarks,
                 'QueueTimeOutURL'        => $this->config->getQueueTimeoutURL(),
                 'ResultURL'              => $this->config->getResultURL(),

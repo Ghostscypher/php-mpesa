@@ -1,7 +1,8 @@
 vendor/
 .vscode/
 .idea/
-tests/unit/temp.php
+tests/Hidden
 .phpunit.result.cache
+.php-cs-fixer.cache
 .env
 .DS_STORE

@@ -101,10 +101,10 @@ class MpesaConfig
             );
         }
 
-        $argument = func_get_args()[0];
+        $argument      = func_get_args()[0];
         $argument_type = gettype($argument);
 
-        if (!in_array($argument_type, ['array', 'string'])) {
+        if (! in_array($argument_type, ['array', 'string'])) {
             throw new MpesaInternalException(
                 'No constructor accepting the argument type supplied found'
             );
@@ -113,10 +113,12 @@ class MpesaConfig
         switch ($argument_type) {
             case 'string':
                 $this->__constructString($argument);
+
                 break;
 
             case 'array':
                 $this->__constructArray($argument);
+
                 break;
 
             default:
@@ -145,6 +147,7 @@ class MpesaConfig
                     // Special case
                     case 'identifier_type':
                         $this->setShortCode($this->getShortCode(), trim($config[$key]));
+
                         break;
 
                     default:
@@ -210,7 +213,7 @@ class MpesaConfig
      */
     public function isSandboxEnvironment(): bool
     {
-        return !$this->isProductionEnvironment();
+        return ! $this->isProductionEnvironment();
     }
 
     /**
@@ -301,9 +304,9 @@ class MpesaConfig
      */
     public function getAuth(): MpesaAuth
     {
-        if (!$this->has_api_credentials_changed
+        if (! $this->has_api_credentials_changed
             && $this->auth !== null
-            && !$this->auth->hasExpired()
+            && ! $this->auth->hasExpired()
         ) {
             return $this->auth;
         }
@@ -339,7 +342,7 @@ class MpesaConfig
         // Identifier type
         $identifier_type = trim($identifier_type);
 
-        if (!in_array($identifier_type, $accepted_identifiers)) {
+        if (! in_array($identifier_type, $accepted_identifiers)) {
             throw new MpesaInternalException(
                 sprintf(
                     "'%s' Invalid identifier type, accepted identifiers are: %s",
@@ -350,7 +353,7 @@ class MpesaConfig
         }
 
         $this->config['identifier_type'] = $identifier_type;
-        $this->config['short_code'] = trim($value);
+        $this->config['short_code']      = trim($value);
 
         return $this;
     }
@@ -597,7 +600,7 @@ class MpesaConfig
             'confirmation_url',
         ];
 
-        if (!in_array($url_name, $available_urls)) {
+        if (! in_array($url_name, $available_urls)) {
             throw new MpesaInternalException(
                 sprintf(
                     "'%s' not found in the configuration, available options are: '%s'",
@@ -697,7 +700,7 @@ class MpesaConfig
     }
 
     /**
-     * @return the initiator password
+     * @return string the initiator password
      */
     public function getInitiatorPassword(): string
     {
@@ -711,7 +714,7 @@ class MpesaConfig
     public function setSecurityCredential(string $value): self
     {
         $this->config['security_credential'] = $value;
-        $this->has_user_credentials_changed = false;
+        $this->has_user_credentials_changed  = false;
 
         return $this;
     }
@@ -723,7 +726,7 @@ class MpesaConfig
      */
     public function getSecurityCredential(): string
     {
-        if (!$this->has_user_credentials_changed && $this->config['security_credential'] !== '') {
+        if (! $this->has_user_credentials_changed && $this->config['security_credential'] !== '') {
             return $this->config['security_credential'];
         }
 
@@ -742,21 +745,19 @@ class MpesaConfig
         // Create the public key
         $public_key = openssl_pkey_get_public($cert_content);
 
-        if (!openssl_public_encrypt(
+        if (! openssl_public_encrypt(
             $this->getInitiatorPassword(),
             $encrypted,
             $public_key,
             OPENSSL_PKCS1_PADDING
         )
         ) {
-            var_dump($encrypted);
-
             throw new MpesaInternalException(
                 'Unable to generate security credential. Perhaps it is bigger than the key size?'
             );
         }
 
-        $this->has_user_credentials_changed = false;
+        $this->has_user_credentials_changed  = false;
         $this->config['security_credential'] = base64_encode($encrypted);
 
         return $this->config['security_credential'];
@@ -793,14 +794,14 @@ class MpesaConfig
     {
         return $this->config['sandbox_certificate_path'] !== '' ?
             $this->config['sandbox_certificate_path'] :
-            __DIR__.'%s/../../certificates/sandbox.cer';
+            __DIR__.'/../../certificates/sandbox.cer';
     }
 
     public function getProductionCertificatePath(): string
     {
         return $this->config['production_certificate_path'] !== '' ?
             $this->config['production_certificate_path'] :
-            __DIR__.'%s/../../certificates/sandbox.cer';
+            __DIR__.'/../../certificates/production.cer';
     }
 
     /**
@@ -817,7 +818,7 @@ class MpesaConfig
 
     /**
      * Checks to see if a certain config key is set
-     * Alias ro the isConfigSet() function.
+     * Alias to the isConfigSet() function.
      *
      * @param bool $key The config key
      *
@@ -839,7 +840,7 @@ class MpesaConfig
      */
     public function setConfig(string $key, string $value): self
     {
-        if (!$this->exists($key)) {
+        if (! $this->exists($key)) {
             throw new MpesaInternalException(
                 "{$key} not found in configuration"
             );
@@ -867,7 +868,7 @@ class MpesaConfig
      */
     public function getConfig(string $key): ?string
     {
-        if (!$this->exists($key)) {
+        if (! $this->exists($key)) {
             return null;
         }
 

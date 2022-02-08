@@ -145,6 +145,7 @@ You can copy the configs below and make them language specific.
         const MPESA_IDENTIFIER_TYPE_TILL = '2';
         const MPESA_IDENTIFIER_TYPE_PAYBILL = '4';
         const MPESA_IDENTIFIER_TYPE_SHORTCODE = '4';
+        const MPESA_IDENTIFIER_TYPE_REVERSAL  = '11';
 
         // Command ids
         const MPESA_COMMAND_ID_TRANSACTION_REVERSAL = 'TransactionReversal';
@@ -266,7 +267,8 @@ class Mpesa {
     // Returns an instance of the MpesaC2B class
     public MpesaC2B C2B();
 
-    // Returns an instance of the MpesaB2B class
+    // Returns an instance of the MpesaB2B class.
+    // @deprecated
     public MpesaB2B B2B();
 
     // Returns an instance of the MpesaB2C class
@@ -295,15 +297,9 @@ class Mpesa {
     // Initiate reversal request
     // transaction_id: The Mpesa code.
     // amount: The amount that is being reversed
-    // receiver_party: the shortcode, or MSISDN that received the payment
-    // receiver_identifier_type: constant that shows the receiver identifier type
-    //         possible values are; MPESA_IDENTIFIER_TYPE_MSISDN, MPESA_IDENTIFIER_TYPE_TILL,
-    //                MPESA_IDENTIFIER_TYPE_PAYBILL , MPESA_IDENTIFIER_TYPE_SHORTCODE 
     public MpesaResponse reverseTransaction(
         transaction_id: string,
         amount: int,
-        receiver_party: string,
-        receiver_identifier_type: CONSTANT,
         optional remarks='remarks': string,
         optional occasion=' ': string
     );

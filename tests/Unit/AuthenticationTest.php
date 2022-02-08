@@ -79,7 +79,7 @@ class AuthenticationTest extends TestCase
     protected function setUp(): void
     {
         $this->mpesa_config = new MpesaConfig(self::$config);
-        $this->mpesa = new Mpesa($this->mpesa_config);
+        $this->mpesa        = new Mpesa($this->mpesa_config);
     }
 
     public function testAuthenticationWithCorrectData()

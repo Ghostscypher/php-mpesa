@@ -31,7 +31,7 @@ trait Validatable
             );
         }
 
-        if (!in_array($value, $required)) {
+        if (! in_array($value, $required)) {
             throw new MpesaInternalException(
                 sprintf(
                     "Invalid value: '%s' for '%s', expected '%s'",

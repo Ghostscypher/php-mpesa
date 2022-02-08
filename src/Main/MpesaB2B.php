@@ -7,6 +7,8 @@ use Hackdelta\Mpesa\Extras\Validatable;
 
 /**
  * Contains actions that can be done for a B2B transaction.
+ * 
+ * @deprecated - This API is no longer supported
  */
 class MpesaB2B
 {

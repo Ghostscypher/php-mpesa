@@ -14,8 +14,8 @@ class MpesaAuth
     use Validatable;
 
     protected MpesaConfig $config;
-    protected int $expires_at = 0;
-    protected string $token = '';
+    protected int $expires_at         = 0;
+    protected string $token           = '';
     protected bool $has_token_changed = false;
 
     protected static ?MpesaHttp $http_client = null;
@@ -34,7 +34,7 @@ class MpesaAuth
 
     public function setAuthToken(string $token, int $expires_at_timestamp): self
     {
-        $this->token = $token;
+        $this->token      = $token;
         $this->expires_at = $expires_at_timestamp;
 
         return $this;
@@ -84,13 +84,13 @@ class MpesaAuth
         $json_data = json_decode($response->getJSONString(), true);
 
         // Set the tokens
-        $this->token = $json_data['access_token'];
+        $this->token      = $json_data['access_token'];
         $this->expires_at = time() + (int) $json_data['expires_in'];
     }
 
     public function getAuthToken(bool $force = false): self
     {
-        if (!$force && !$this->hasExpired()) {
+        if (! $force && ! $this->hasExpired()) {
             return $this;
         }
 

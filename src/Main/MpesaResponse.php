@@ -7,16 +7,16 @@ namespace Hackdelta\Mpesa\Main;
  */
 class MpesaResponse
 {
-    protected string $response_body = '';
+    protected string $response_body    = '';
     protected string $response_headers = '';
-    protected int $status_code = 0;
+    protected int $status_code         = 0;
 
     public function __construct(
         string $response_body,
         string $response_headers,
         int $status_code
     ) {
-        $this->response_body = trim($response_body);
+        $this->response_body    = trim($response_body);
         $this->response_headers = trim($response_headers);
 
         $this->status_code = $status_code;

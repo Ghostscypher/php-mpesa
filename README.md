@@ -239,27 +239,19 @@ $mpesa = new Mpesa($config);
 
 // Check internal
 function test_getting_auth_token() {
-   global $mpesa;
-
    echo $mpesa->getConfig()->getAuth()->getToken();
 }
 
 // C2B
 function test_registering_c2b_callbacks() {
-   global $mpesa;
-
    echo $mpesa->C2B()->registerURL();
 }
 
 function test_simulating_transaction() {
-   global $mpesa;
-
    echo $mpesa->C2B()->simulate('254708374149', 100, 'test account reference');
 }
 
 function test_initiating_stk_push() {
-   global $mpesa;
-
    $mpesa->getConfig()
          ->setConfig("short_code", '174379')
          ->setConfig("business_short_code", '174379');
@@ -275,8 +267,6 @@ function test_initiating_stk_push() {
 }
 
 function test_getting_Stk_push_status() {
-   global $mpesa;
-   
    $mpesa->getConfig()
          ->setConfig("short_code", '174379')
          ->setConfig("business_short_code", '174379');
@@ -292,42 +282,29 @@ function test_getting_Stk_push_status() {
 
 // General
 function test_getting_balance() {
-   global $mpesa;
-
    echo $mpesa->checkBalance();
 }
 
 function test_reversal() {
-   global $mpesa;
-
    // Change 'PE341HJ3Q8' to a test value gotten after simulating the transaction
-   echo $mpesa->reverseTransaction('PE341HJ3Q8', 100, '254708263715', MpesaConstants::MPESA_IDENTIFIER_TYPE_MSISDN);
+   echo $mpesa->reverseTransaction('PE341HJ3Q8', 100, '2547000000000',                       MpesaConstants::MPESA_IDENTIFIER_TYPE_MSISDN);
 
 }
 
 function test_checking_transaction_Status() {
-   global $mpesa;
-
    echo $mpesa->checkTransactionStatus('PE341HJ3Q8');
-
 }
 
 function test_register_pull_url() {
-   global $mpesa;
-
    echo $mpesa->pullRequestRegisterURL();
 }
 
 function test_pull() {
-   global $mpesa;
-
    echo $mpesa->pullRequestQuery("2019-07-31 20:00:00", "2019-07-31 22:00:00");
 }
 
 // B2C
 function test_B2C() {
-   global $mpesa;
-
    echo $mpesa->B2C()->send(
         100, 
         '254700000000',
@@ -337,8 +314,6 @@ function test_B2C() {
 
 // B2B
 function test_B2B() {
-   global $mpesa;
-
    echo $mpesa->B2B()->send(
         10, 
         '600000',
@@ -1033,13 +1008,7 @@ try{
    $response = $mpesa->reverseTransaction(
          'transaction id', // The mpesa transaction id to reverse e.g. MX1C1K2LIM
          10, // The amount to be reversed
-         'receiver_party', // The MSISDN or short code of the reciever party
-         'receiver_identifier_type', // The reciever identifier type possible values are:
-                                    // MpesaConstants::MPESA_IDENTIFIER_TYPE_MSISDN,
-                                    // MpesaConstants::MPESA_IDENTIFIER_TYPE_PAYBILL,
-                                    // MpesaConstants::MPESA_IDENTIFIER_TYPE_TILL,
-                                    // MpesaConstants::MPESA_IDENTIFIER_TYPE_SHORTCODE,
-
+         
          // Optional parameters
          'remarks', // The remarks for the transactions
          'occasion' // Occasion for the transaction

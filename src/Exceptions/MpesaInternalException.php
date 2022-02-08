@@ -15,14 +15,4 @@ class MpesaInternalException extends Exception
     {
         parent::__construct($message);
     }
-
-    public function getStatusCode(): int
-    {
-        return $this->status_code;
-    }
-
-    public function getErrorBody(): string
-    {
-        return $this->error_body;
-    }
 }

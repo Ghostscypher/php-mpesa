@@ -15,13 +15,13 @@ The following specifies the mpesa endpoints, their data and their expected respo
     - [_Request format_](#request-format-2)
   - [Business to client (B2C)](#business-to-client-b2c)
     - [_Request format_](#request-format-3)
-  - [Business to business (B2B)](#business-to-business-b2b)
+  - [Business to business (B2B) (Deprecated)](#business-to-business-b2b-deprecated)
     - [_Request format_](#request-format-4)
   - [Account balance query](#account-balance-query)
     - [_Request format_](#request-format-5)
   - [Transaction status query](#transaction-status-query)
     - [_Request format_](#request-format-6)
-  - [Reversal request](#reversal-request)
+  - [Reversal request (Deprcated)](#reversal-request-deprcated)
     - [_Request format_](#request-format-7)
   - [Initiate stk push](#initiate-stk-push)
     - [_Request format_](#request-format-8)
@@ -282,7 +282,9 @@ Response:
   
 ```
 
-## Business to business (B2B)
+## Business to business (B2B) (Deprecated)
+
+This API is no longer supported
 
 Method: `POST`
 
@@ -557,7 +559,8 @@ Response:
   }
 ```
 
-## Reversal request
+## Reversal request (Deprcated)
+This API is no longer supported from API
 
 Method: `POST`
 
@@ -582,9 +585,8 @@ Body:
     "CommandID":"TransactionReversal", //  	Unique command for each transaction type, possible values are: TransactionReversal.
     "TransactionID":" ", // Organization/MSISDN sending the transaction.
     "Amount":" ", //
-    "PartyA": " ", // Organization/MSISDN sending the transaction.
     "ReceiverParty":" ", // Type of organization receiving the transaction.
-    "RecieverIdentifierType":"4",
+    "RecieverIdentifierType":"11",
     "ResultURL":"https://ip_address:port/result_url",
     "QueueTimeOutURL":"https://ip_address:port/timeout_url",
     "Remarks":" ",

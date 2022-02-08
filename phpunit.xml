@@ -25,6 +25,10 @@
             <directory suffix="Test.php">./tests/Unit</directory>
         </testsuite>
 
+        <testsuite name="Hidden">
+            <directory suffix="Test.php">./tests/Hidden</directory>
+        </testsuite>
+
     </testsuites>
     
     <!-- <filter>
