@@ -164,11 +164,10 @@ class Mpesa
         return $response;
     }
 
-    /** 
+    /**
      * Initiate reversal request
      * transaction_id: The Mpesa code.
      * amount: The amount that is being reversed
-     * @deprecated This API is no longer supported
     */
     public function reverseTransaction(
         string $transaction_id,

@@ -21,7 +21,7 @@ The following specifies the mpesa endpoints, their data and their expected respo
     - [_Request format_](#request-format-5)
   - [Transaction status query](#transaction-status-query)
     - [_Request format_](#request-format-6)
-  - [Reversal request (Deprcated)](#reversal-request-deprcated)
+  - [Reversal request](#reversal-request)
     - [_Request format_](#request-format-7)
   - [Initiate stk push](#initiate-stk-push)
     - [_Request format_](#request-format-8)
@@ -559,8 +559,7 @@ Response:
   }
 ```
 
-## Reversal request (Deprcated)
-This API is no longer supported from API
+## Reversal request
 
 Method: `POST`
 
