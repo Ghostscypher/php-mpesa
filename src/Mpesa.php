@@ -26,8 +26,12 @@ class Mpesa
 
     protected MpesaConfig $config;
 
-    public function __construct(MpesaConfig $config)
+    public function __construct(MpesaConfig | array $config)
     {
+        if (is_array($config)) {
+            $config = new MpesaConfig($config);
+        }
+
         $this->config = $config;
 
         if (self::$http_client === null) {
@@ -35,8 +39,12 @@ class Mpesa
         }
     }
 
-    public function setConfig(MpesaConfig $config): self
+    public function setConfig(MpesaConfig | array $config): self
     {
+        if (is_array($config)) {
+            $config = new MpesaConfig($config);
+        }
+
         $this->config = $config;
 
         // Change the other classes config to
@@ -120,10 +128,12 @@ class Mpesa
     // transaction_id: This is the mpesa code
     // Remarks: comments sent along with the transaction
     // Occasion: additional data sent with the transaction
+    // original_conversation_id You can use this instead of transaction id
     public function checkTransactionStatus(
         string $transaction_id,
         string $remarks = 'remarks',
-        string $occasion = ' '
+        string $occasion = ' ',
+        string $original_conversation_id = '',
     ): MpesaResponse {
         $url = sprintf(
             '%s%s',
@@ -134,28 +144,39 @@ class Mpesa
         // Validate that data is correct
         $this->validateString('initiator_name', $this->config->getInitiator());
         $this->validateString('security_credential', $this->config->getSecurityCredential());
-        $this->validateString('transaction_id', $transaction_id);
         $this->validateString('short_code', $this->config->getShortCode());
         $this->validateString('queue_timeout_url', $this->config->getQueueTimeoutURL());
         $this->validateString('result_url', $this->config->getResultURL());
 
         $this->validateString('remarks', $remarks);
 
+        if (empty($original_conversation_id) && empty($original_conversation_id)) {
+            $this->validateString('transaction_id', $transaction_id);
+        } elseif (empty($transaction_id) && ! empty($original_conversation_id)) {
+            $this->validateString('original_conversation_id', $transaction_id);
+        }
+
+        $data = [
+            'Initiator'          => $this->config->getInitiator(),
+            'SecurityCredential' => $this->config->getSecurityCredential(),
+            'CommandID'          => MpesaConstants::MPESA_COMMAND_ID_TRANSACTION_STATUS_QUERY,
+            'TransactionID'      => $transaction_id,
+            'PartyA'             => $this->config->getShortCode(),
+            'IdentifierType'     => $this->config->getIdentifierType(),
+            'Remarks'            => $remarks,
+            'QueueTimeOutURL'    => $this->config->getQueueTimeoutURL(),
+            'ResultURL'          => $this->config->getResultURL(),
+            'Occasion'           => $occasion,
+        ];
+
+        if (! empty($original_conversation_id)) {
+            $data += ['OriginalConversationID' => $original_conversation_id];
+        }
+
         $response = self::$http_client->request(
             'POST',
             $url,
-            [
-                'Initiator'          => $this->config->getInitiator(),
-                'SecurityCredential' => $this->config->getSecurityCredential(),
-                'CommandID'          => MpesaConstants::MPESA_COMMAND_ID_TRANSACTION_STATUS_QUERY,
-                'TransactionID'      => $transaction_id,
-                'PartyA'             => $this->config->getShortCode(),
-                'IdentifierType'     => $this->config->getIdentifierType(),
-                'Remarks'            => $remarks,
-                'QueueTimeOutURL'    => $this->config->getQueueTimeoutURL(),
-                'ResultURL'          => $this->config->getResultURL(),
-                'Occasion'           => $occasion,
-            ],
+            $data,
             [
                 'Authorization' => sprintf('Bearer %s', $this->config->getAuth()->getToken()),
             ]

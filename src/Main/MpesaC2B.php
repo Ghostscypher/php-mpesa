@@ -17,8 +17,12 @@ class MpesaC2B
 
     protected static ?MpesaHttp $http_client = null;
 
-    public function __construct(MpesaConfig $config)
+    public function __construct(MpesaConfig | array $config)
     {
+        if (is_array($config)) {
+            $config = new MpesaConfig($config);
+        }
+
         $this->config = $config;
 
         if (self::$http_client === null) {
@@ -26,8 +30,12 @@ class MpesaC2B
         }
     }
 
-    public function setConfig(MpesaConfig $config): self
+    public function setConfig(MpesaConfig | array $config): self
     {
+        if (is_array($config)) {
+            $config = new MpesaConfig($config);
+        }
+
         $this->config = $config;
 
         return $this;
@@ -109,6 +117,19 @@ class MpesaC2B
         );
 
         return $response;
+    }
+
+    /**
+     * Alias to initiateSTKPush
+     */
+    public function STKPush(
+        string $to,
+        int $amount,
+        string $account_reference = '',
+        string $description = 'Description',
+        string $timestamp = ''
+    ): MpesaResponse {
+        return $this->initiateSTKPush($to, $amount, $account_reference, $description, $timestamp);
     }
 
     public function initiateSTKPush(

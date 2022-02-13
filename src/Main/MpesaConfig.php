@@ -805,6 +805,17 @@ class MpesaConfig
     }
 
     /**
+     * @param string $token The auth token to be set
+     * @param int $expires_at - The time this token will expire
+     */
+    public function setToken(string $token, int $expires_at = 0): self
+    {
+        $this->getAuth()->setAuthToken($token, $expires_at);
+
+        return $this;
+    }
+
+    /**
      * Checks to see if a certain config key is set.
      *
      * @param bool $key The config key

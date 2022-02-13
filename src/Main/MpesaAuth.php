@@ -32,10 +32,10 @@ class MpesaAuth
         }
     }
 
-    public function setAuthToken(string $token, int $expires_at_timestamp): self
+    public function setAuthToken(string $token, int $expires_at_timestamp = 0): self
     {
         $this->token      = $token;
-        $this->expires_at = $expires_at_timestamp;
+        $this->expires_at = $expires_at_timestamp === 0 ? time() + 3600 : $expires_at_timestamp;
 
         return $this;
     }
@@ -106,7 +106,7 @@ class MpesaAuth
 
     public function getExpiresAtTime(): int
     {
-        return $this->expired_at;
+        return $this->expires_at;
     }
 
     public function getToken(): string

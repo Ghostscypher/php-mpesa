@@ -16,8 +16,12 @@ class MpesaB2C
 
     protected static ?MpesaHttp $http_client = null;
 
-    public function __construct(MpesaConfig $config)
+    public function __construct(MpesaConfig | array $config)
     {
+        if (is_array($config)) {
+            $config = new MpesaConfig($config);
+        }
+
         $this->config = $config;
 
         if (self::$http_client === null) {
@@ -25,8 +29,12 @@ class MpesaB2C
         }
     }
 
-    public function setConfig(MpesaConfig $config): self
+    public function setConfig(MpesaConfig | array $config): self
     {
+        if (is_array($config)) {
+            $config = new MpesaConfig($config);
+        }
+
         $this->config = $config;
 
         return $this;

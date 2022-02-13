@@ -230,6 +230,23 @@ You can copy the configs below and make them language specific.
         // MPesa request PULL request
         const MPESA_REQUEST_TYPE_PULL = 'Pull';
 
+        // Mpesa whitelisted IPs
+        // @see https://openbase.com/js/mpesa-api/documentation
+        const MPESA_WHITELIST_IPS = [
+            '196.201.214.200',
+            '196.201.214.206',
+            '196.201.213.114',
+            '196.201.214.207',
+            '196.201.214.208',
+            '196.201.213.44',
+            '196.201.212.127',
+            '196.201.212.128',
+            '196.201.212.129',
+            '196.201.212.132',
+            '196.201.212.136',
+            '196.201.212.138',
+        ];
+
     }
 ```
 
@@ -291,7 +308,8 @@ class Mpesa {
     public MpesaResponse checkTransactionStatus(
         transaction_id: string,
         optional remarks='remarks': string,
-        optional occasion=' ': string
+        optional occasion=' ': string,
+        optional original_conversation_id = '' : string,
     );
 
     // Initiate reversal request
@@ -450,7 +468,7 @@ class MpesaAuth {
     // token: token to set
     // expires_at_timestamp: UNIX timestamp to indicate when
     // token will expire
-    public MpesaAuth setAuthToken(token: string, expires_at_timestamp: long/int);
+    public MpesaAuth setAuthToken(token: string, optional expires_at_timestamp = 0: long/int);
 
     // Sets thc config, will override the current config
     // Remember to validate the data
@@ -462,7 +480,7 @@ class MpesaAuth {
     // Used to generate token from consumer keys and secret
     // Use force to generate new token irregardless of whether
     // the token has expired or not
-    public MpesaAuth getAuthToken(optional force: boolean);
+    public MpesaAuth getAuthToken(optional force = false: boolean);
 
     // Check whether the credentials has expired
     public boolean hasExpired();
@@ -542,6 +560,11 @@ class MpesaConfig {
     // token: auth token
     // expires: unsigned integer
     public MpesaAuth getAuth();
+
+    // Sets the access token, used to overide the internal auth token
+    // especially when the token is cached
+    // token
+    public MpesaConfig setToken(token: string, optional $expires_at = 0: int);
 
     // Used to set the shortcode, this is usually the
     // partyA or partyB depending on the transaction
@@ -761,10 +784,10 @@ class MpesaC2B {
     // Constructor
     // We need to pass in the config by ref
     // The command id, of the shortcode this is will be determined by the shortcode identifier type
-    MpesaC2B(config: MpesaConfig);
+    MpesaC2B(config: MpesaConfig | array);
 
     // Used to overwrite the default config set 
-    public MpesaC2B setConfig(config: MpesaConfig);
+    public MpesaC2B setConfig(config: MpesaConfig | array);
 
     // Return the current config
     public MpesaConfig getConfig();
@@ -778,6 +801,20 @@ class MpesaC2B {
     // Account reference is used as the account number for paybill, will be ignored, 
     // when using till
     public MpesaResponse simulate(MSISDN: string, amount :int, optional account_reference = '': string);
+
+    // Initiate STK push query
+    // amount: is an unsigned int always check for negative or 0
+    // to: the MSISDN sending the funds
+    // account_reference: 
+    // timestamp: must be in the format 'yyyymmddhhiiss'
+    // Alias to initiateSTKPush, just call initiateSTKPush from
+    // here
+    public MpesaResponse STKPush(
+        to: string, 
+        amount: int, 
+        optional account_reference = '': string, 
+        optional description = 'Description': string
+        optional timestamp = '': string);
 
     // Initiate STK push query
     // amount: is an unsigned int always check for negative or 0
