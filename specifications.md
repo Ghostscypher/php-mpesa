@@ -27,9 +27,6 @@ implementation of  the specifications below.
   - [MPesa configuration class](#mpesa-configuration-class)
   - [Mpesa HTTP client class](#mpesa-http-client-class)
   - [Mpesa response class](#mpesa-response-class)
-  - [Mpesa client to business (C2B) class](#mpesa-client-to-business-c2b-class)
-  - [Mpesa business to business (B2B) client class](#mpesa-business-to-business-b2b-client-class)
-  - [Mpesa business to client (B2C) class](#mpesa-business-to-client-b2c-class)
 
 ## The folder structure
 
@@ -66,12 +63,6 @@ You can copy the certificates from the [Certificates folder]('./../certificates'
 
 `Main/MpesaResponse.ext` - The MpesaResponse class
 
-`Main/MpesaC2B.ext` - The MpesaC2B class
-
-`Main/MpesaB2B.ext` - The MpesaB2B class
-
-`Main/MpesaB2C.ext` - The MpesaB2C class
-
 #### Exceptions folder
 
 `src/Exceptions/` - Where to store exceptions
@@ -94,7 +85,7 @@ You can copy the certificates from the [Certificates folder]('./../certificates'
 
 ### Base directory
 
-`LICENCE` - Copy of the licence, preferably MIT licence
+`LICENSE` - Copy of the LICENSE, preferably MIT LICENSE
 
 `README.md` - An introduction to our library and how to use it for that particular language.
 
@@ -258,38 +249,107 @@ requests such as
 1. Account balance query
 2. Transaction status query
 3. Reversal request
+4. Register and confirmationURL/ValidationURL endpoints
+5. Simulate transaction - Only available in sandbox environment
+6. Initiate an STK push request
+7. Check the status of the STK push i.e. STK push query
+8. Register pull transaction URL
+9. Initiate pull request
+10. B2B send money (Deprecated)
+11. B2C send money
 
 The code below shows what is expected to be in the mpesa classes
 
 ```c#
 class Mpesa {
 
-    // Create singleton instance of the following classes
-    protected static MpesaB2C B2C;
-    protected static MpesaC2B C2B;
-    protected static MpesaB2B B2B;
-
     // Initialize the class here, also initialize the singleton instance
     // only once
-    Mpesa(config: MpesaConfig); 
+    Mpesa(config: MpesaConfig | dictionary: key: string, value: string); 
 
     // Allows a user to override the current config
     // options
-    public Mpesa setConfig(config: MpesaConfig);
+    public Mpesa setConfig(config: MpesaConfig | dictionary: key: string, value: string);
 
     // Gets the Mpesa config singleton instance and allows a 
     // user to change the configurations before the next request
     public MpesaConfig getConfig();
 
-    // Returns an instance of the MpesaC2B class
-    public MpesaC2B C2B();
+     // Performs the register
+    // All data is in config
+    public MpesaResponse registerURL();
+
+    // Simulate a transaction, this is only available in sandbox 
+    // amount is an unsigned int always check for negative or 0
+    // Account reference is used as the account number for paybill, will be ignored, 
+    // when using till
+    public MpesaResponse simulate(MSISDN: string, amount :int, optional account_reference = '': string);
+
+    // Initiate STK push query
+    // amount: is an unsigned int always check for negative or 0
+    // to: the MSISDN sending the funds
+    // account_reference: 
+    // timestamp: must be in the format 'yyyymmddhhiiss'
+    // Alias to initiateSTKPush, just call initiateSTKPush from
+    // here
+    public MpesaResponse STKPush(
+        to: string, 
+        amount: int, 
+        optional account_reference = '': string, 
+        optional description = 'Description': string
+        optional timestamp = '': string);
+
+    // Initiate STK push query
+    // amount: is an unsigned int always check for negative or 0
+    // to: the MSISDN sending the funds
+    // account_reference: 
+    // timestamp: must be in the format 'yyyymmddhhiiss'
+    public MpesaResponse initiateSTKPush(
+        to: string, 
+        amount: int, 
+        optional account_reference = '': string, 
+        optional description = 'Description': string
+        optional timestamp = '': string);
+
+    // Query the mpesa client gateway to check for the status of an STK push
+    // We generate our timestamp if it is not filled, timestamp must be in the format 'yyyymmddhhiiss'
+    public MpesaResponse STKPushQuery(
+        checkout_request_id: string, 
+        optional timestamp = '': string
+    );
 
     // Returns an instance of the MpesaB2B class.
     // @deprecated
-    public MpesaB2B B2B();
+    // Perform a B2B transaction
+    // amount: amount to transact
+    // to: Organization’s short code receiving funds being transacted.
+    // receiver_identifier_type: specifies the identifier type of the receiver
+    //       supported types include: TODO: add supported constants here
+    // account_reference: optional account sent if we are using paybill
+    // remarks: comments sent along with the transaction
+    public MpesaResponse sendB2B(
+        amount: int, 
+        to: string,
+        command_id: CONSTANT,
+        receiver_identifier_type: CONSTANT,
+        optional account_reference = '': string,
+        optional remarks = 'remarks': string
+    );
 
-    // Returns an instance of the MpesaB2C class
-    public MpesaB2C B2C();
+    // Perform a B2C transaction
+    // amount: amount to transact
+    // to: MSISDN receiving funds being transacted.
+    // command IDs
+    // account_reference: optional account sent if we are using paybill
+    // remarks: comments sent along with the transaction
+    // occasion: optional description sent along with the transaction
+    public MpesaResponse sendB2C(
+        amount: int, 
+        to: string,
+        command_id: CONSTANT,
+        optional remarks = 'remarks': string,
+        optional occasion = '': string
+    );
 
     // The following specifies the general requests found in this class
     // these are:
@@ -566,6 +626,12 @@ class MpesaConfig {
     // token
     public MpesaConfig setToken(token: string, optional $expires_at = 0: int);
 
+    //Returns the auth token
+    public function getToken();
+
+    //Returns timestamp when the current token will expire
+    public function getExpiresAtTime();
+
     // Used to set the shortcode, this is usually the
     // partyA or partyB depending on the transaction
     // identifier_type, indicates the kind of shortcode this is
@@ -764,155 +830,6 @@ class MpesaResponse {
 
     // Return the headers as JSON string
     public string getHeadersJSONString();
-
-}
-
-```
-
-## Mpesa client to business (C2B) class
-
-This class will contain logic for handling all the client to business requests/logic this includes
-
-1. Register and confirmationURL/ValidationURL endpoints
-2. Simulate transaction - Only available in sandbox environment
-3. Initiate an STK push request
-4. Check the status of the STK push i.e. STK push query
-5. Register pull transaction URL
-
-``` java
-class MpesaC2B {
-    // Constructor
-    // We need to pass in the config by ref
-    // The command id, of the shortcode this is will be determined by the shortcode identifier type
-    MpesaC2B(config: MpesaConfig | array);
-
-    // Used to overwrite the default config set 
-    public MpesaC2B setConfig(config: MpesaConfig | array);
-
-    // Return the current config
-    public MpesaConfig getConfig();
-
-    // Performs the register
-    // All data is in config
-    public MpesaResponse registerURL();
-
-    // Simulate a transaction, this is only available in sandbox 
-    // amount is an unsigned int always check for negative or 0
-    // Account reference is used as the account number for paybill, will be ignored, 
-    // when using till
-    public MpesaResponse simulate(MSISDN: string, amount :int, optional account_reference = '': string);
-
-    // Initiate STK push query
-    // amount: is an unsigned int always check for negative or 0
-    // to: the MSISDN sending the funds
-    // account_reference: 
-    // timestamp: must be in the format 'yyyymmddhhiiss'
-    // Alias to initiateSTKPush, just call initiateSTKPush from
-    // here
-    public MpesaResponse STKPush(
-        to: string, 
-        amount: int, 
-        optional account_reference = '': string, 
-        optional description = 'Description': string
-        optional timestamp = '': string);
-
-    // Initiate STK push query
-    // amount: is an unsigned int always check for negative or 0
-    // to: the MSISDN sending the funds
-    // account_reference: 
-    // timestamp: must be in the format 'yyyymmddhhiiss'
-    public MpesaResponse initiateSTKPush(
-        to: string, 
-        amount: int, 
-        optional account_reference = '': string, 
-        optional description = 'Description': string
-        optional timestamp = '': string);
-
-    // Query the mpesa client gateway to check for the status of an STK push
-    // We generate our timestamp if it is not filled, timestamp must be in the format 'yyyymmddhhiiss'
-    public MpesaResponse STKPushQuery(
-        checkout_request_id: string, 
-        optional timestamp = '': string
-    );
-
-}
-
-```
-
-## Mpesa business to business (B2B) client class
-
-This class will handle the logic of performing a B2B related request, it has one method only
-
-1. B2Bpayment
-
-``` java
-class MpesaB2B {
-    
-    // Constructor
-    // Pass in the mpesa config by ref, this configuration will be immutable
-    // command_id will be a constant specifying the commandID
-    MpesaB2B(config: MpesaConfig);
-
-    // Used to overwrite the default config set 
-    public MpesaB2B setConfig(config: MpesaConfig);
-
-    // Return the current config
-    public MpesaConfig getConfig();
-
-    // Perform a B2B transaction
-    // amount: amount to transact
-    // to: Organization’s short code receiving funds being transacted.
-    // receiver_identifier_type: specifies the identifier type of the receiver
-    //       supported types include: TODO: add supported constants here
-    // account_reference: optional account sent if we are using paybill
-    // remarks: comments sent along with the transaction
-    public MpesaResponse send(
-        amount: int, 
-        to: string,
-        command_id: CONSTANT,
-        receiver_identifier_type: CONSTANT,
-        optional account_reference = '': string,
-        optional remarks = 'remarks': string
-    );
-
-}
-
-```
-
-## Mpesa business to client (B2C) class
-
-This class will handle logic of performing B2C related request, it has one method only
-
-1. B2Cpayment
-
-``` java
-class MpesaB2C {
-    // Constructor
-    // Pass in the mpesa config by ref, this configuration will be immutable
-    // command_id will be a constant specifying the commandID
-    // TODO: Add the supported command ids here
-    MpesaB2C(config: MpesaConfig);
-
-    // Used to overwrite the default config set 
-    public MpesaB2C setConfig(config: MpesaConfig);
-
-    // Return the current config
-    public MpesaConfig getConfig();
-
-    // Perform a B2C transaction
-    // amount: amount to transact
-    // to: MSISDN receiving funds being transacted.
-    // command IDs
-    // account_reference: optional account sent if we are using paybill
-    // remarks: comments sent along with the transaction
-    // occasion: optional description sent along with the transaction
-    public MpesaResponse send(
-        amount: int, 
-        to: string,
-        command_id: CONSTANT,
-        optional remarks = 'remarks': string,
-        optional occasion = '': string
-    );
 
 }
 

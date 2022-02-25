@@ -22,10 +22,7 @@ class MpesaAuth
 
     public function __construct(MpesaConfig $config)
     {
-        $this->validateString('Consumer key', $config->getConsumerKey());
-        $this->validateString('Consumer secret', $config->getConsumerSecret());
-
-        $this->config = $config;
+        $this->setConfig($config);
 
         if (self::$http_client === null) {
             self::$http_client = new MpesaHttp($this->config);
@@ -34,6 +31,8 @@ class MpesaAuth
 
     public function setAuthToken(string $token, int $expires_at_timestamp = 0): self
     {
+        $this->validateString('token', $token);
+
         $this->token      = $token;
         $this->expires_at = $expires_at_timestamp === 0 ? time() + 3600 : $expires_at_timestamp;
 
@@ -55,7 +54,7 @@ class MpesaAuth
         return $this->config;
     }
 
-    private function refreshToken(): void
+    protected function refreshToken(): void
     {
         $auth_url = sprintf(
             '%s%s',
@@ -106,6 +105,9 @@ class MpesaAuth
 
     public function getExpiresAtTime(): int
     {
+        // Will refresh token if it has expired
+        $this->getAuthToken();
+
         return $this->expires_at;
     }
 

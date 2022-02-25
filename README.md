@@ -188,7 +188,7 @@ use Hackdelta\Mpesa\Exceptions\MpesaInternalException;
 use Hackdelta\Mpesa\Exceptions\MpesaClientExceptions;
 use Hackdelta\Mpesa\Exceptions\MpesaServerException;
 
-$config = new MpesaConfig([
+$config = [
    // API Credentials
    'consumer_key'    => 'YOUR_CONSUMER_KEY', // <--- Change this
    'consumer_secret' => 'YOUR_CONSUMER_SECRET', // <--- Change this
@@ -233,36 +233,36 @@ $config = new MpesaConfig([
                                           // number that receives confirmation messages
    'pull_callback_url'   => 'https://domain.example.com/callback.php',
 
-]);
+];
 
 $mpesa = new Mpesa($config);
 
 // Check internal
 function test_getting_auth_token() {
-   echo $mpesa->getConfig()->getAuth()->getToken();
+   echo $mpesa->getConfig()->getToken();
 }
 
 // C2B
 function test_registering_c2b_callbacks() {
-   echo $mpesa->C2B()->registerURL();
+   echo $mpesa->registerURL();
 }
 
 function test_simulating_transaction() {
-   echo $mpesa->C2B()->simulate('254708374149', 100, 'test account reference');
+   echo $mpesa->simulate('254708374149', 100, 'test account reference');
 }
 
 function test_initiating_stk_push() {
    $mpesa->getConfig()
-         ->setConfig("short_code", '174379')
-         ->setConfig("business_short_code", '174379');
+         ->setShortcode("short_code", '174379')
+         ->setBusinessShortCode("business_short_code", '174379');
    
    // Change "254700000000" to your phone number
-   echo $mpesa->C2B()->initiateSTKPush("254700000000", 1, "Test", "Test");
+   echo $mpesa->STKPush("254700000000", 1, "Test", "Test");
 
    // Reset config back
    $mpesa->getConfig()
-         ->setConfig("short_code", '601497')
-         ->setConfig("business_short_code", '601497');
+         ->setShortcode("short_code", '601497')
+         ->setBusinessShortCode("business_short_code", '601497');
    
 }
 
@@ -272,7 +272,7 @@ function test_getting_Stk_push_status() {
          ->setConfig("business_short_code", '174379');
 
    // Change the checkout id to the one you git from running the above
-   echo $mpesa->C2B()->STKPushQuery("ws_CO_030520210342393444");
+   echo $mpesa->STKPushQuery("ws_CO_030520210342393444");
 
    // Reset config back
    $mpesa->getConfig()
@@ -314,7 +314,7 @@ function test_B2C() {
 
 // B2B
 function test_B2B() {
-   echo $mpesa->B2B()->send(
+   echo $mpesa->sendB2B(
         10, 
         '600000',
         MpesaConstants::MPESA_COMMAND_ID_BUSINESS_PAY_BILL,

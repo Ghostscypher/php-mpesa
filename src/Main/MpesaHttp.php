@@ -58,7 +58,7 @@ class MpesaHttp
         }
     }
 
-    private function client(
+    protected function client(
         string $method,
         string $uri,
         ?array $body = null,
