@@ -116,7 +116,7 @@ class Mpesa
         string $transaction_id,
         string $remarks = 'remarks',
         string $occasion = ' ',
-        string $original_conversation_id = '',
+        string $original_conversation_id = ''
     ): MpesaResponse {
         $url = sprintf(
             '%s%s',

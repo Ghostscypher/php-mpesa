@@ -941,7 +941,7 @@ Identifier types - both sender and receiver - identify an M-Pesa transaction’s
 This describes the response codes gotten from the gateway
 M-Pesa Result Codes
 
-| Result Code | Description
+| Result Code  | Description
 | ------------ | :------------------------------------ |
 | 0            | Success                               |
 | 1            | Insufficient Funds                    |
@@ -951,7 +951,7 @@ M-Pesa Result Codes
 | 5            | Would Exceed Minimum Balance          |
 | 6            | Unresolved Primary Party              |
 | 7            | Unresolved Receiver Party             |
-| 8            | Would Exceed Maximum Balance         |
+| 8            | Would Exceed Maximum Balance          |
 | 11           | Debit Account Invalid                 |
 | 12           | Credit Account Invalid                |
 | 13           | Unresolved Debit Account              |
