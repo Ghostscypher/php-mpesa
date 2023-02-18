@@ -62,6 +62,10 @@ class MpesaAuth
             MpesaConstants::MPESA_URIS['generate_token']
         );
 
+        if (self::$http_client === null) {
+            self::$http_client = new MpesaHttp($this->config);
+        }
+
         $response = self::$http_client->request(
             'GET',
             $auth_url,

@@ -305,7 +305,7 @@ function test_pull() {
 
 // B2C
 function test_B2C() {
-   echo $mpesa->B2C()->send(
+   echo $mpesa->sendB2C(
         100, 
         '254700000000',
         MpesaConstants::MPESA_COMMAND_ID_SALARY_PAYMENT 

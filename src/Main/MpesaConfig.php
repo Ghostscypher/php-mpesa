@@ -139,7 +139,7 @@ class MpesaConfig
             if (isset($config[$key])) {
                 if (gettype($config[$key]) !== 'string') {
                     throw new MpesaInternalException(
-                        "Value of {$key} - '${value}' in your config must be a string"
+                        "Value of {$key} - '{$value}' in your config must be a string"
                     );
                 }
 
