@@ -64,7 +64,7 @@ Description: Gets the auth token that is used by the rest of the transactions
 
 headers:
 
-`Authorization: Bearer {base64(consumer_key + consumer_secret)}` - Required
+`Authorization: Basic {base64("consumer_key:consumer_secret")}` - Required
 
 `cache-control: no-cache` - optional
 
