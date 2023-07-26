@@ -1,4 +1,4 @@
-# Php mpesa library
+# PHP mpesa library
 
 [![Latest Stable Version](https://poser.pugx.org/hackdelta/mpesa/v)](//packagist.org/packages/hackdelta/mpesa)
 [![Total Downloads](https://poser.pugx.org/hackdelta/mpesa/downloads)](//packagist.org/packages/hackdelta/mpesa)
@@ -8,7 +8,7 @@
 
 ## Table of contents
 
-- [Php mpesa library](#php-mpesa-library)
+- [PHP mpesa library](#php-mpesa-library)
   - [Table of contents](#table-of-contents)
   - [Introduction](#introduction)
   - [Getting Started](#getting-started)
